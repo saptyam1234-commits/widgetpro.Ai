@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login | ChatWidgetPro</title>
+  <title>Signup | ChatWidgetPro</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -25,61 +26,57 @@
       <a href="index.html" class="hover:text-indigo-400">Home</a>
       <a href="index.html#about" class="hover:text-indigo-400">About</a>
       <a href="pricing.html" class="hover:text-indigo-400">Pricing</a>
-      <a href="login.html" class="text-indigo-400">Login</a>
+      <a href="login.html" class="hover:text-indigo-400">Login</a>
       <a href="signup.html"
          class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-gradient-to-r hover:from-indigo-500 hover:to-indigo-700 transition-all">
         Get Started
       </a>
     </nav>
+
   </div>
 </header>
 
-<!-- HERO + LOGIN SECTION -->
+<!-- HERO + SIGNUP SECTION -->
 <section class="relative min-h-[calc(100vh-80px)] flex items-center justify-center px-4"
   style="background: url('your-high-quality-background.jpg') center/cover no-repeat;">
 
   <!-- Overlay -->
   <div class="absolute inset-0 bg-black/50"></div>
 
-  <!-- LOGIN CARD -->
+  <!-- SIGNUP CARD -->
   <div class="relative bg-black/70 backdrop-blur-lg shadow-2xl rounded-3xl p-10 w-full max-w-md text-gray-100">
     <h2 class="text-3xl font-bold text-center text-indigo-400 mb-6">
-      Welcome Back
+      Create Your Account
     </h2>
+  
+    <input id="name" type="text" placeholder="Full Name"
+      class="w-full mb-4 p-4 rounded-xl border border-gray-600 bg-black/40 focus:ring-2 focus:ring-indigo-400 placeholder-gray-300 text-white">
 
     <input id="email" type="email" placeholder="Email"
       class="w-full mb-4 p-4 rounded-xl border border-gray-600 bg-black/40 focus:ring-2 focus:ring-indigo-400 placeholder-gray-300 text-white">
 
     <input id="password" type="password" placeholder="Password"
       class="w-full mb-4 p-4 rounded-xl border border-gray-600 bg-black/40 focus:ring-2 focus:ring-indigo-400 placeholder-gray-300 text-white">
-  
-    <p class="text-right mb-4">
-      <a href="#" id="forgotPassword" class="text-indigo-400 text-sm font-semibold hover:underline">
-        Forgot Password?
-      </a>
-    </p>
 
-    <button id="loginBtn"
+    <button id="signupBtn"
       class="w-full bg-gradient-to-r from-indigo-600 to-indigo-800 text-white font-bold py-3 rounded-xl hover:scale-105 transition-transform shadow-lg">
-      Login
+      Sign Up
     </button>
 
     <p class="text-center text-gray-300 mt-5">
-      New here?
-      <a href="signup.html" class="text-indigo-400 font-semibold hover:underline">
-        Create account
-      </a>
+      Already have an account?
+      <a href="login.html" class="text-indigo-400 font-semibold hover:underline">Login</a>
     </p>
   </div>
 </section>
 
-<!-- FIREBASE AUTH -->
+<!-- FIREBASE AUTH -->  
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
   import { 
     getAuth, 
-    signInWithEmailAndPassword,
-    sendPasswordResetEmail
+    createUserWithEmailAndPassword,
+    updateProfile 
   } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -91,29 +88,24 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // LOGIN
-  document.getElementById("loginBtn").onclick = () => {
+  document.getElementById("signupBtn").onclick = async () => {
+    const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then(() => window.location.href = "dashboard.html")
-      .catch(err => alert(err.message));
-  };
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-  // FORGOT PASSWORD
-  document.getElementById("forgotPassword").onclick = () => {
-    const email = document.getElementById("email").value;
+      await updateProfile(userCredential.user, {
+        displayName: name
+      });
 
-    if (!email) {
-      alert("Please enter your email first");
-      return;
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      alert(err.message);
     }
-
-    sendPasswordResetEmail(auth, email)
-      .then(() => alert("Password reset link sent to your email 📩"))
-      .catch(err => alert(err.message));
   };
 </script>
+
 </body>
 </html>
