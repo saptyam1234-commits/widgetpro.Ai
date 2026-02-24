@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard | ChatWidgetPro</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-900 font-roboto text-gray-100 min-h-screen">
+
+<!-- NAVBAR -->
+<header class="bg-black/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+  <div class="container mx-auto flex justify-between items-center p-4">
+    <span class="text-2xl font-bold text-indigo-400">ChatWidgetPro</span>
+    <nav class="flex items-center gap-4 font-semibold">
+      <span class="text-indigo-400">Dashboard</span>
+      <button id="logoutBtn"
+        class="bg-red-600 hover:bg-red-700 transition px-4 py-2 rounded-lg font-bold">
+        Logout
+      </button>
+    </nav>
+  </div>
+</header>
+
+<!-- MAIN CONTAINER -->
+<section class="container mx-auto py-8 px-6">
+
+  <!-- DASHBOARD HEADER -->
+  <div class="bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-white p-6 rounded-2xl mb-6 shadow-lg">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold">Dashboard Overview</h1>
+        <p class="text-sm opacity-90">Business • Leads • AI • Billing</p>
+      </div>
+      <div class="text-right">
+        <span class="px-4 py-2 rounded-full bg-green-500 font-semibold">
+          ACTIVE
+        </span>
+        <p class="text-sm mt-1">Expiry: 25 Mar 2026</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="flex flex-wrap gap-3 mb-6">
+    <button onclick="showSlide(0)" class="tab-btn bg-gray-800 hover:bg-indigo-600">Overview</button>
+    <button onclick="showSlide(1)" class="tab-btn bg-gray-800 hover:bg-indigo-600">Leads</button>
+    <button onclick="showSlide(2)" class="tab-btn bg-gray-800 hover:bg-indigo-600">Follow-Ups</button>
+    <button onclick="showSlide(3)" class="tab-btn bg-gray-800 hover:bg-indigo-600">Business Info</button>
+    <button onclick="showSlide(4)" class="tab-btn bg-gray-800 hover:bg-indigo-600">Plans & Billing</button>
+  </div>
+
+  <!-- SLIDES -->
+
+  <!-- OVERVIEW -->
+  <div class="slide">
+    <!-- STATS -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="stat-card bg-black/70 backdrop-blur-lg">Total Leads<br><b>120</b></div>
+      <div class="stat-card bg-black/70 backdrop-blur-lg">New Today<br><b>12</b></div>
+      <div class="stat-card bg-black/70 backdrop-blur-lg">Pending Follow-ups<br><b>8</b></div>
+      <div class="stat-card bg-black/70 backdrop-blur-lg">Converted<br><b>45</b></div>
+    </div>
+
+    <!-- USER INFO -->
+    <div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6 mb-6">
+      <p><b>Email:</b> <span id="userEmail"></span></p>
+      <p><b>Current Plan:</b> <span class="text-green-400">Starter</span></p>
+    </div>
+
+    <!-- API KEY -->
+    <div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6 mb-6">
+      <h2 class="text-xl font-bold mb-3">Your API Key</h2>
+      <div class="flex gap-3">
+        <input id="apiKey" readonly class="w-full p-3 border rounded bg-gray-800 text-gray-200">
+        <button onclick="generateKey()"
+          class="bg-indigo-600 hover:bg-indigo-700 transition px-4 rounded-lg font-bold text-white">
+          Generate
+        </button>
+      </div>
+    </div>
+
+    <!-- WIDGET CODE -->
+    <div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6">
+      <h2 class="text-xl font-bold mb-3">Widget Code</h2>
+      <textarea id="widgetCode" rows="4" readonly
+        class="w-full p-3 border rounded bg-gray-800 text-gray-200"></textarea>
+      <button onclick="copyCode()"
+        class="mt-3 bg-green-600 hover:bg-green-700 transition px-6 py-2 rounded-lg font-bold text-white">
+        Copy Code
+      </button>
+    </div>
+  </div>
+
+  <!-- LEADS -->
+  <div class="slide hidden">
+    <h2 class="text-xl font-bold mb-4">Lead Management</h2>
+    <table class="w-full bg-black/70 backdrop-blur-lg rounded-2xl shadow text-gray-200">
+      <tr class="bg-gray-800">
+        <th class="p-2">Name</th>
+        <th class="p-2">Phone</th>
+        <th class="p-2">Status</th>
+        <th class="p-2">Follow-up</th>
+      </tr>
+      <tr>
+        <td class="p-2">Rahul</td>
+        <td class="p-2">9876543210</td>
+        <td class="p-2">Interested</td>
+        <td class="p-2">Tomorrow</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- FOLLOW UPS -->
+  <div class="slide hidden">
+    <h2 class="text-xl font-bold mb-4">Follow-Up Dashboard</h2>
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="stat-card bg-black/70 backdrop-blur-lg">Today<br><b>5</b></div>
+      <div class="stat-card bg-black/70 backdrop-blur-lg">Upcoming<br><b>10</b></div>
+      <div class="stat-card bg-black/70 backdrop-blur-lg text-red-400">Missed<br><b>2</b></div>
+    </div>
+  </div>
+
+  <!-- BUSINESS INFO -->
+  <div class="slide hidden">
+    <h2 class="text-2xl font-bold mb-6">Business Information</h2>
+    <div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6 mb-4">
+      <input class="p-3 border rounded w-full mb-3 bg-gray-800 text-gray-200" placeholder="Business Name">
+      <input class="p-3 border rounded w-full mb-3 bg-gray-800 text-gray-200" placeholder="Working Hours">
+      <textarea class="p-3 border rounded w-full bg-gray-800 text-gray-200" placeholder="Products / Services"></textarea>
+    </div>
+    <button class="bg-indigo-600 hover:bg-indigo-700 transition px-6 py-3 rounded-lg font-bold text-white">
+      Save Business Info
+    </button>
+  </div>
+
+  <!-- BILLING -->
+  <div class="slide hidden" id="billingSlide">
+    <h2 class="text-xl font-bold mb-4">Plans & Billing</h2>
+
+    <div class="stat-card bg-black/70 backdrop-blur-lg mb-3">
+      Current Plan: <span id="planName" class="font-bold text-indigo-400">Basic</span>
+    </div>
+    <div class="stat-card bg-black/70 backdrop-blur-lg mb-3">
+      Price: ₹<span id="planPrice">999</span>/month
+    </div>
+    <div class="stat-card bg-black/70 backdrop-blur-lg mb-3">
+      Remaining Messages: <span id="remainingMessages">55</span>
+    </div>
+    <div class="stat-card bg-black/70 backdrop-blur-lg mb-4">
+      Expires On: <span id="planExpiry" class="font-bold text-red-500">28 Feb 2026</span>
+    </div>
+
+    <div class="flex gap-4" id="billingActions"></div>
+  </div>
+
+</section>
+
+<!-- STYLES -->
+<style>
+  .tab-btn{
+    padding:10px 18px;
+    border-radius:10px;
+    font-weight:600;
+    background:#1f2937;
+    transition:all 0.3s;
+  }
+  .tab-btn:hover{
+    background:#4f46e5;
+    color:white;
+  }
+  .stat-card{
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 12px rgba(0,0,0,.3);
+    text-align:center;
+  }
+</style>
+
+<!-- SLIDE LOGIC -->
+<script>
+  const slides = document.querySelectorAll(".slide");
+  function showSlide(i){
+    slides.forEach((s,idx)=>s.classList.toggle("hidden", idx!==i));
+  }
+  showSlide(0);
+</script>
+
+<!-- FIREBASE AUTH + DASHBOARD LOGIC -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDJZf0H3YN9XoDDvIFOMtCo-FubyuGlHyA",
+  authDomain: "konrk-88f13.firebaseapp.com",
+  projectId: "konrk-88f13",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) location.href = "login.html";
+  if (user) document.getElementById("userEmail").innerText = user.email;
+});
+
+document.getElementById("logoutBtn").onclick = () =>
+  signOut(auth).then(()=>location.href="login.html");
+
+// ================== GENERATE KEY ==================
+window.generateKey = () => {
+  const key = "api_" + Math.random().toString(36).substring(2,18);
+  document.getElementById("apiKey").value = key;
+  document.getElementById("widgetCode").value =
+    '<scr' + 'ipt src="https://backend-cyvm.onrender.com/api/widget" data-key="' 
+    + key + '"></scr' + 'ipt>';
+};
+
+// ================== COPY ==================
+window.copyCode = () => {
+  navigator.clipboard.writeText(document.getElementById("widgetCode").value);
+  alert("Copied ✅");
+};
+
+// ================== BILLING ==================
+const userSubscription = {
+  plan: "basic",
+  price: 999,
+  remainingMessages: 55,
+  expiry: "2026-02-28"
+};
+
+function initBilling() {
+  document.getElementById("planName").innerText = capitalize(userSubscription.plan);
+  document.getElementById("planPrice").innerText = userSubscription.price;
+  document.getElementById("remainingMessages").innerText = userSubscription.remainingMessages;
+  document.getElementById("planExpiry").innerText = userSubscription.expiry;
+
+  const expiryDate = new Date(userSubscription.expiry + "T23:59:59");
+  const today = new Date();
+  const actions = document.getElementById("billingActions");
+  actions.innerHTML = "";
+
+  if (expiryDate < today) {
+    actions.innerHTML =
+      '<button onclick="renewPlan()" class="bg-red-600 hover:bg-red-700 transition px-4 py-2 rounded-lg font-bold w-full">Renew Plan</button>';
+  } else {
+    actions.innerHTML =
+      '<button onclick="renewPlan()" class="bg-green-600 hover:bg-green-700 transition px-4 py-2 rounded-lg font-bold">Renew</button>' +
+      (userSubscription.plan !== "pro"
+        ? '<button onclick="upgradePlan()" class="bg-indigo-600 hover:bg-indigo-700 transition px-4 py-2 rounded-lg font-bold">Upgrade</button>'
+        : '');
+  }
+}
+
+window.renewPlan = () => subscribe(userSubscription.plan);
+window.upgradePlan = () => subscribe("pro");
+
+function capitalize(text) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function subscribe(plan){
+  alert("Redirecting to payment for " + plan);
+}
+
+initBilling();
+</script>
+
+</body>
+</html>
