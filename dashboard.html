@@ -212,7 +212,7 @@ document.getElementById("logoutBtn").onclick = () =>
   signOut(auth).then(()=>location.href="login.html");
 
 // ================== GENERATE KEY ==================
-<script>
+  
 window.generateKey = () => {
   const key = "api_" + Math.random().toString(36).substring(2,18);
 
@@ -228,7 +228,7 @@ window.copyCode = () => {
   );
   alert("Copied ✅");
 };
-</script>
+
 
 // ================== BILLING ==================
 const userSubscription = {
