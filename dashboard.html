@@ -260,24 +260,55 @@ function subscribe(plan){
 
 initBilling();
 </script>
+
 <script>
-function generateKey() {
+
+/* ===============================
+   GENERATE WIDGET KEY + SNIPPET
+================================ */
+
+window.generateKey = async () => {
 
   const key = "api_" + Math.random().toString(36).substring(2,18);
 
   document.getElementById("apiKey").value = key;
 
-  document.getElementById("widgetCode").value =
-  `<script src="https://backend-cyvm.onrender.com/api/widget?key=${key}"></script>`;
+  try{
 
-}
+    const response = await fetch(
+      "https://backend-cyvm.onrender.com/api/widget/generate",
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          apiKey:key,
+          businessId:"demo_business",
+          domain:window.location.hostname
+        })
+      }
+    );
 
-function copyCode() {
-  navigator.clipboard.writeText(
-    document.getElementById("widgetCode").value
-  );
-  alert("Copied ✅");
-}
+    const data = await response.json();
+
+    if(data.success){
+
+      document.getElementById("widgetCode").value =
+      `<script src="https://backend-cyvm.onrender.com/api/widget?key=${key}"></script>`;
+
+    }else{
+      alert("Snippet generation failed");
+    }
+
+  }catch(err){
+    console.error(err);
+    alert("Server error");
+  }
+
+};
+
 </script>
+  
 </body>
 </html>
