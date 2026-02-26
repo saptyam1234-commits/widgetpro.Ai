@@ -215,9 +215,8 @@ document.getElementById("logoutBtn").onclick = () =>
 window.generateKey = () => {
   const key = "api_" + Math.random().toString(36).substring(2,18);
   document.getElementById("apiKey").value = key;
-  document.getElementById("widgetCode").value =
-    '<scr' + 'ipt src="https://backend-cyvm.onrender.com/api/widget" data-key="' 
-    + key + '"></scr' + 'ipt>';
+   document.getElementById("widgetCode").value =
+    `<script src="https://backend-cyvm.onrender.com/api/widget?key=${key}"></script>`;
 };
 
 // ================== COPY ==================
