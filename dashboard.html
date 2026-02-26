@@ -261,54 +261,66 @@ function subscribe(plan){
 initBilling();
 </script>
 
-<script>
+// ================== GENERATE KEY ==================
 
-/* ===============================
-   WIDGET KEY GENERATOR (FINAL FIX)
-================================ */
+window.generateKey = async () => {
 
-window.generateKey = async function(){
+const key = "api_" + Math.random().toString(36).substring(2,18);
 
-  try{
+document.getElementById("apiKey").value = key;
 
-    const key = "api_" + Math.random().toString(36).substring(2,18);
+try{
 
-    document.getElementById("apiKey").value = key;
+const response = await fetch(
+"https://backend-cyvm.onrender.com/api/widget/generate",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+apiKey:key,
+businessId:"demo_business",
+domain:window.location.hostname
+})
+});
 
-    const response = await fetch(
-      "https://backend-cyvm.onrender.com/api/widget/generate",
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-          apiKey:key,
-          businessId:"demo_business",
-          domain:window.location.hostname
-        })
-      }
-    );
+const data = await response.json();
 
-    const data = await response.json();
+if(data.success){
 
-    if(data.success){
+document.getElementById("widgetCode").value =
+`<script src="https://backend-cyvm.onrender.com/api/widget?key=${key}"></script>`;
 
-      document.getElementById("widgetCode").value =
-      `<script src="https://backend-cyvm.onrender.com/api/widget?key=${key}"><\/script>`;
+}else{
+alert("Snippet generation failed");
+}
 
-    }else{
-      alert("Snippet generation failed");
-    }
-
-  }catch(err){
-    console.error(err);
-    alert("Server error");
-  }
+}catch(err){
+console.error(err);
+alert("Server error");
+}
 
 };
 
-</script>
+
+
+// ================== COPY CODE ==================
+
+window.copyCode = () => {
+
+const code = document.getElementById("widgetCode").value;
+
+if(!code){
+alert("Nothing to copy");
+return;
+}
+
+navigator.clipboard.writeText(code);
+
+alert("Copied ✅");
+
+};
   
 </body>
 </html>
