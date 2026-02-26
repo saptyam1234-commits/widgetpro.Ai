@@ -212,18 +212,23 @@ document.getElementById("logoutBtn").onclick = () =>
   signOut(auth).then(()=>location.href="login.html");
 
 // ================== GENERATE KEY ==================
+<script>
 window.generateKey = () => {
   const key = "api_" + Math.random().toString(36).substring(2,18);
+
   document.getElementById("apiKey").value = key;
-   document.getElementById("widgetCode").value =
-    `<script src="https://backend-cyvm.onrender.com/api/widget?key=${key}"></script>`;
+
+  document.getElementById("widgetCode").value =
+  `<script src="https://backend-cyvm.onrender.com/api/widget?key=${key}"></script>`;
 };
 
-// ================== COPY ==================
 window.copyCode = () => {
-  navigator.clipboard.writeText(document.getElementById("widgetCode").value);
+  navigator.clipboard.writeText(
+    document.getElementById("widgetCode").value
+  );
   alert("Copied ✅");
 };
+</script>
 
 // ================== BILLING ==================
 const userSubscription = {
