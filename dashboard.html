@@ -264,16 +264,16 @@ initBilling();
 <script>
 
 /* ===============================
-   GENERATE WIDGET KEY + SNIPPET
+   WIDGET KEY GENERATOR (FINAL FIX)
 ================================ */
 
-window.generateKey = async () => {
-
-  const key = "api_" + Math.random().toString(36).substring(2,18);
-
-  document.getElementById("apiKey").value = key;
+window.generateKey = async function(){
 
   try{
+
+    const key = "api_" + Math.random().toString(36).substring(2,18);
+
+    document.getElementById("apiKey").value = key;
 
     const response = await fetch(
       "https://backend-cyvm.onrender.com/api/widget/generate",
@@ -295,7 +295,7 @@ window.generateKey = async () => {
     if(data.success){
 
       document.getElementById("widgetCode").value =
-      `<script src="https://backend-cyvm.onrender.com/api/widget?key=${key}"></script>`;
+      `<script src="https://backend-cyvm.onrender.com/api/widget?key=${key}"><\/script>`;
 
     }else{
       alert("Snippet generation failed");
