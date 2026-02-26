@@ -288,7 +288,9 @@ async function generateKey(){
     if(data.success){
 
       document.getElementById("widgetCode").value =
-      `<script src="https://backend-cyvm.onrender.com/api/widget?key=${key}"></script>`;
+      `<script src="https://backend-cyvm.onrender.com/api/widget?key=${key}"><\/script>`;
+
+      alert("Snippet Generated ✅");
 
     }
 
@@ -297,8 +299,6 @@ async function generateKey(){
     alert("Server error");
   }
 }
-
-window.generateKey = generateKey;
 
 </script>
 
