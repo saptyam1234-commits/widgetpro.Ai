@@ -299,6 +299,17 @@ async function generateKey(){
     alert("Server error");
   }
 }
+function copyCode() {
+    const codeElement = document.getElementById("snippetCode");
+    const text = codeElement.innerText;
+
+    navigator.clipboard.writeText(text)
+        .then(() => {
+            alert("Code copied!");
+        })
+        .catch(err => {
+            console.error("Copy failed:", err);
+        });
 
 </script>
 
