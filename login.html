@@ -81,6 +81,13 @@
     signInWithEmailAndPassword,
     sendPasswordResetEmail
   } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+ 
+  import { 
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDJZf0H3YN9XoDDvIFOMtCo-FubyuGlHyA",
@@ -90,16 +97,62 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db = getFirestore(app);
 
   // LOGIN
-  document.getElementById("loginBtn").onclick = () => {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+  document.getElementById("loginBtn").onclick = async () => {
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then(() => window.location.href = "dashboard.html")
-      .catch(err => alert(err.message));
-  };
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try {
+
+    const userCredential =
+      await signInWithEmailAndPassword(auth, email, password);
+
+    const user = userCredential.user;
+    const uid = user.uid;
+
+    const userRef = doc(db, "users", uid);
+    const userSnap = await getDoc(userRef);
+
+    let businessId;
+
+    // ✅ First login
+    if (!userSnap.exists()) {
+
+      businessId = "BUS-" + uid.slice(0, 6);
+
+      await setDoc(userRef, {
+        email: user.email,
+        plan: "free",
+        businessId: businessId,
+        createdAt: new Date()
+      });
+
+      // ✅ Business document
+      await setDoc(doc(db, "businesses", businessId), {
+        ownerUid: uid,
+        companyName: "",
+        service: "",
+        customPrompt: "",
+        websiteData: "",
+        createdAt: new Date()
+      });
+
+    } else {
+      businessId = userSnap.data().businessId;
+    }
+
+    localStorage.setItem("businessId", businessId);
+
+    window.location.href = "dashboard.html";
+
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
 
   // FORGOT PASSWORD
   document.getElementById("forgotPassword").onclick = () => {
