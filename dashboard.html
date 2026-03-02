@@ -126,16 +126,34 @@
 
   <!-- BUSINESS INFO -->
   <div class="slide hidden">
-    <h2 class="text-2xl font-bold mb-6">Business Information</h2>
-    <div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6 mb-4">
-      <input class="p-3 border rounded w-full mb-3 bg-gray-800 text-gray-200" placeholder="Business Name">
-      <input class="p-3 border rounded w-full mb-3 bg-gray-800 text-gray-200" placeholder="Working Hours">
-      <textarea class="p-3 border rounded w-full bg-gray-800 text-gray-200" placeholder="Products / Services"></textarea>
-    </div>
-    <button class="bg-indigo-600 hover:bg-indigo-700 transition px-6 py-3 rounded-lg font-bold text-white">
+  <h2 class="text-2xl font-bold mb-6">Business Information</h2>
+
+  <form id="businessForm"
+    class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6 mb-4">
+
+    <input id="companyName"
+      class="p-3 border rounded w-full mb-3 bg-gray-800 text-gray-200"
+      placeholder="Business Name">
+
+    <input id="service"
+      class="p-3 border rounded w-full mb-3 bg-gray-800 text-gray-200"
+      placeholder="Working Hours">
+
+    <textarea id="customPrompt"
+      class="p-3 border rounded w-full mb-3 bg-gray-800 text-gray-200"
+      placeholder="Custom AI Prompt"></textarea>
+
+    <textarea id="websiteData"
+      class="p-3 border rounded w-full bg-gray-800 text-gray-200"
+      placeholder="Products / Services"></textarea>
+
+    <button type="submit"
+      class="mt-4 bg-indigo-600 hover:bg-indigo-700 transition px-6 py-3 rounded-lg font-bold text-white w-full">
       Save Business Info
     </button>
-  </div>
+
+  </form>
+</div>
 
   <!-- BILLING -->
   <div class="slide hidden" id="billingSlide">
@@ -193,7 +211,8 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-
+import {  getFirestore,doc,getDoc,updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+  
 const firebaseConfig = {
   apiKey: "AIzaSyDJZf0H3YN9XoDDvIFOMtCo-FubyuGlHyA",
   authDomain: "konrk-88f13.firebaseapp.com",
@@ -202,16 +221,57 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
+onAuthStateChanged(auth, async (user) => {
 
-onAuthStateChanged(auth, (user) => {
-  if (!user) location.href = "login.html";
-  if (user) document.getElementById("userEmail").innerText = user.email;
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  document.getElementById("userEmail").innerText = user.email;
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (userSnap.exists()) {
+    window.businessId = userSnap.data().businessId;
+  }
+
+});
+
+// 👇 YAHAN ADD KARO
+const form = document.getElementById("businessForm");
+
+if (form) {
+  form.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    if (!window.businessId) {
+      alert("Business ID not loaded yet");
+      return;
+    }
+
+    const businessRef = doc(db, "businesses", window.businessId);
+
+    await updateDoc(businessRef, {
+      companyName: document.getElementById("companyName").value,
+      service: document.getElementById("service").value,
+      customPrompt: document.getElementById("customPrompt").value,
+      websiteData: document.getElementById("websiteData").value,
+    });
+
+    alert("Business Profile Updated 🚀");
+  });
+}
+
 });
 
 document.getElementById("logoutBtn").onclick = () =>
   signOut(auth).then(()=>location.href="login.html");
 
-// ================== GENERATE KEY ==================
+
 
 
 // ================== BILLING ==================
