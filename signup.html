@@ -73,12 +73,8 @@
 <!-- FIREBASE AUTH -->  
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { 
-    getAuth, 
-    createUserWithEmailAndPassword,
-    updateProfile 
-  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-
+  import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import {  getFirestore, doc,setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
   const firebaseConfig = {
     apiKey: "AIzaSyDJZf0H3YN9XoDDvIFOMtCo-FubyuGlHyA",
     authDomain: "konrk-88f13.firebaseapp.com",
@@ -87,7 +83,7 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-
+  const db = getFirestore(app);   // ✅ YES
   document.getElementById("signupBtn").onclick = async () => {
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
