@@ -360,8 +360,8 @@ async function generateKey(){
   }
 }
 function copyCode() {
-    const codeElement = document.getElementById("snippetCode");
-    const text = codeElement.innerText;
+    const codeElement = document.getElementById("widgetCode"); // also fix id
+    const text = codeElement.value;
 
     navigator.clipboard.writeText(text)
         .then(() => {
@@ -369,6 +369,8 @@ function copyCode() {
         })
         .catch(err => {
             console.error("Copy failed:", err);
+        });
+}
         });
 
 </script>
