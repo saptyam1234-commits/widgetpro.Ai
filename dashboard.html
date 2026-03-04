@@ -224,46 +224,32 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-  
   onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "login.html";
     return;
   }
 
-  document.getElementById("userEmail").innerText = user.email;
-
   const userRef = doc(db, "users", user.uid);
-  const userSnap = await getDoc(userRef);
+  const snap = await getDoc(userRef);
 
-  if (!userSnap.exists()) {
-    alert("User data not found. Please login again.");
-    window.location.href = "login.html";
-    return;
-  }
+  if (!snap.exists()) return;
 
-  const userData = userSnap.data();
+  const data = snap.data();
+  const expiry = data.planExpiry?.toDate();
+  const now = new Date();
 
-  // ✅ Business ID
-  window.businessId = userData.businessId;
+  let isExpired = expiry && now > expiry;
 
-  // ✅ Show Plan
-  const planElement = document.getElementById("userPlan");
+  // UI Plan Show
+  document.getElementById("userPlan").innerText =
+    isExpired ? "Expired" : data.plan;
 
-  if (userData.plan === "trial" && userData.planExpiry) {
+  document.getElementById("remainingMessages").innerText =
+    data.remainingMessages;
 
-    const expiryDate = userData.planExpiry.toDate();
-
-    if (new Date() > expiryDate) {
-      planElement.innerText = "Trial Expired";
-      planElement.classList.remove("text-green-400");
-      planElement.classList.add("text-red-400");
-    } else {
-      planElement.innerText = "Trial (Active)";
-    }
-
-  } else {
-    planElement.innerText = userData.plan;
+  if (isExpired) {
+    await updateDoc(userRef, { isActive: false });
   }
 });
 
@@ -299,49 +285,70 @@ if (logoutBtn) {
     signOut(auth).then(() => location.href = "login.html");
 }
 
-// ================= BILLING =================
-const userSubscription = {
-  plan: "basic",
-  price: 999,
-  remainingMessages: 55,
-  expiry: "2026-02-28"
-};
+================= BILLING SYSTEM =================
+  
+  async function initBilling(user) {
 
-function initBilling() {
-  document.getElementById("planName").innerText = capitalize(userSubscription.plan);
-  document.getElementById("planPrice").innerText = userSubscription.price;
-  document.getElementById("remainingMessages").innerText = userSubscription.remainingMessages;
-  document.getElementById("planExpiry").innerText = userSubscription.expiry;
+  const userRef = doc(db, "users", user.uid);
+  const snap = await getDoc(userRef);
+  const data = snap.data();
 
-  const expiryDate = new Date(userSubscription.expiry + "T23:59:59");
-  const today = new Date();
+  const expiry = data.planExpiry?.toDate();
+  const now = new Date();
+  const expired = expiry && now > expiry;
+
+  document.getElementById("planName").innerText = data.plan;
+  document.getElementById("planExpiry").innerText =
+    expiry ? expiry.toDateString() : "N/A";
+  document.getElementById("remainingMessages").innerText =
+    data.remainingMessages;
+
   const actions = document.getElementById("billingActions");
   actions.innerHTML = "";
 
-  if (expiryDate < today) {
+  if (expired) {
     actions.innerHTML =
-      '<button onclick="renewPlan()" class="bg-red-600 px-4 py-2 rounded-lg font-bold w-full">Renew Plan</button>';
+      '<button onclick="renewPlan()" class="bg-red-600 px-4 py-2 rounded-lg w-full font-bold">Renew Plan</button>';
   } else {
     actions.innerHTML =
       '<button onclick="renewPlan()" class="bg-green-600 px-4 py-2 rounded-lg font-bold">Renew</button>' +
-      (userSubscription.plan !== "pro"
-        ? '<button onclick="upgradePlan()" class="bg-indigo-600 px-4 py-2 rounded-lg font-bold">Upgrade</button>'
+      (data.plan !== "pro"
+        ? '<button onclick="upgradePlan()" class="bg-indigo-600 px-4 py-2 rounded-lg font-bold ml-2">Upgrade</button>'
         : '');
   }
 }
 
-window.renewPlan = () => subscribe(userSubscription.plan);
-window.upgradePlan = () => subscribe("pro");
+window.renewPlan = async () => {
 
-function capitalize(text) {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
+  const user = auth.currentUser;
+  const userRef = doc(db, "users", user.uid);
 
-function subscribe(plan) {
-  alert("Redirecting to payment for " + plan);
-}
+  await updateDoc(userRef, {
+    plan: "basic",
+    planExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    remainingMessages: 1000,
+    isActive: true
+  });
 
-initBilling();
+  alert("Plan Renewed Successfully");
+  location.reload();
+};
+
+window.upgradePlan = async () => {
+
+  const user = auth.currentUser;
+  const userRef = doc(db, "users", user.uid);
+
+  await updateDoc(userRef, {
+    plan: "pro",
+    planExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    remainingMessages: 5000,
+    isActive: true
+  });
+
+  alert("Upgraded to Pro");
+  location.reload();
+};
 </script>
 
 <!-- ================= API KEY + WIDGET ================= -->
