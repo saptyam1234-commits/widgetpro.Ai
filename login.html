@@ -121,14 +121,15 @@
     // ✅ First login
     if (!userSnap.exists()) {
 
-      businessId = "BUS-" + uid.slice(0, 6);
+     businessId = "BUS-" + uid.slice(0, 6);
 
-      await setDoc(userRef, {
-        email: user.email,
-        plan: "free",
-        businessId: businessId,
-        createdAt: new Date()
-      });
+await setDoc(userRef, {
+  email: user.email,
+  plan: "trial",
+  planExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  businessId: businessId,
+  createdAt: new Date()
+ });
 
       // ✅ Business document
       await setDoc(doc(db, "businesses", businessId), {
