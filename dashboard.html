@@ -68,7 +68,7 @@
     <!-- USER INFO -->
     <div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6 mb-6">
       <p><b>Email:</b> <span id="userEmail"></span></p>
-      <p><b>Current Plan:</b> <span class="text-green-400">Starter</span></p>
+      <p><b>Current Plan:</b> <span id="userPlan" class="text-green-400"></span>
     </div>
 
     <!-- API KEY -->
@@ -224,8 +224,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ================= AUTH =================
-onAuthStateChanged(auth, async (user) => {
+  
+  onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "login.html";
     return;
@@ -236,8 +236,34 @@ onAuthStateChanged(auth, async (user) => {
   const userRef = doc(db, "users", user.uid);
   const userSnap = await getDoc(userRef);
 
-  if (userSnap.exists()) {
-    window.businessId = userSnap.data().businessId;
+  if (!userSnap.exists()) {
+    alert("User data not found. Please login again.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const userData = userSnap.data();
+
+  // ✅ Business ID
+  window.businessId = userData.businessId;
+
+  // ✅ Show Plan
+  const planElement = document.getElementById("userPlan");
+
+  if (userData.plan === "trial" && userData.planExpiry) {
+
+    const expiryDate = userData.planExpiry.toDate();
+
+    if (new Date() > expiryDate) {
+      planElement.innerText = "Trial Expired";
+      planElement.classList.remove("text-green-400");
+      planElement.classList.add("text-red-400");
+    } else {
+      planElement.innerText = "Trial (Active)";
+    }
+
+  } else {
+    planElement.innerText = userData.plan;
   }
 });
 
