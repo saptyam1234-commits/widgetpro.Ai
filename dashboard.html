@@ -230,7 +230,13 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // USER EMAIL SHOW
+onAuthStateChanged(auth, async (user) => {
+
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
   document.getElementById("userEmail").innerText = user.email;
 
   const userRef = doc(db, "users", user.uid);
@@ -241,9 +247,8 @@ onAuthStateChanged(auth, async (user) => {
   const data = snap.data();
 
   const businessId = data.businessId;
-  window.businessId = businessId;   // important
+  window.businessId = businessId;
 
-  // LOAD BUSINESS
   const businessRef = doc(db, "businesses", businessId);
   const businessSnap = await getDoc(businessRef);
 
@@ -253,12 +258,26 @@ onAuthStateChanged(auth, async (user) => {
 
   const expiry = business.expiry ? new Date(business.expiry) : null;
   const now = new Date();
-
   const isExpired = expiry && now > expiry;
 
-  // PLAN SHOW
   document.getElementById("userPlan").innerText =
     isExpired ? "Expired" : business.plan;
+
+  // ================= USAGE =================
+
+  const usageRef = doc(db, "usage", businessId);
+  const usageSnap = await getDoc(usageRef);
+
+  if (usageSnap.exists()) {
+
+    const usage = usageSnap.data();
+
+    const remaining =
+      usage.messageLimit - usage.messagesUsed;
+
+    document.getElementById("remainingMessages").innerText = remaining;
+
+  }
 
 });
 
@@ -308,7 +327,7 @@ if (logoutBtn) {
     signOut(auth).then(() => location.href = "login.html");
 }
 
-================= BILLING SYSTEM =================
+// ================= BILLING SYSTEM =================
   
   async function initBilling(user) {
 
