@@ -86,7 +86,8 @@
   getFirestore,
   doc,
   getDoc,
-  setDoc
+  setDoc 
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -99,11 +100,16 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // LOGIN
-  document.getElementById("loginBtn").onclick = async () => {
+// LOGIN
+document.getElementById("loginBtn").onclick = async () => {
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if(!email || !password){
+    alert("Please enter email and password");
+    return;
+  }
 
   try {
 
@@ -118,31 +124,33 @@
 
     let businessId;
 
-    // ✅ First login
+    // FIRST LOGIN
     if (!userSnap.exists()) {
 
-     businessId = "BUS-" + uid.slice(0, 6);
+      businessId = "BUS-" + uid.slice(0,6);
 
-await setDoc(userRef, {
-  email: user.email,
-  plan: "trial",
-  planExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-  businessId: businessId,
-  createdAt: new Date()
- });
+      await setDoc(userRef, {
+        email: user.email,
+        plan: "trial",
+        businessId: businessId,
+        planExpiry: Date.now() + (7 * 24 * 60 * 60 * 1000),
+        createdAt: serverTimestamp()
+      });
 
-      // ✅ Business document
+      // BUSINESS COLLECTION
       await setDoc(doc(db, "businesses", businessId), {
         ownerUid: uid,
         companyName: "",
         service: "",
         customPrompt: "",
         websiteData: "",
-        createdAt: new Date()
+        createdAt: serverTimestamp()
       });
 
     } else {
+
       businessId = userSnap.data().businessId;
+
     }
 
     localStorage.setItem("businessId", businessId);
@@ -150,24 +158,29 @@ await setDoc(userRef, {
     window.location.href = "dashboard.html";
 
   } catch (err) {
+
     alert(err.message);
+
   }
+
 };
 
 
-  // FORGOT PASSWORD
-  document.getElementById("forgotPassword").onclick = () => {
-    const email = document.getElementById("email").value;
+// FORGOT PASSWORD
+document.getElementById("forgotPassword").onclick = () => {
 
-    if (!email) {
-      alert("Please enter your email first");
-      return;
-    }
+  const email = document.getElementById("email").value;
 
-    sendPasswordResetEmail(auth, email)
-      .then(() => alert("Password reset link sent to your email 📩"))
-      .catch(err => alert(err.message));
-  };
+  if (!email) {
+    alert("Please enter your email first");
+    return;
+  }
+
+  sendPasswordResetEmail(auth, email)
+    .then(() => alert("Password reset link sent to your email 📩"))
+    .catch(err => alert(err.message));
+
+};
 </script>
 </body>
 </html>
