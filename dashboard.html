@@ -317,38 +317,14 @@ if (logoutBtn) {
         : '');
   }
 }
-
-window.renewPlan = async () => {
-
-  const user = auth.currentUser;
-  const userRef = doc(db, "users", user.uid);
-
-  await updateDoc(userRef, {
-    plan: "basic",
-    planExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-    remainingMessages: 1000,
-    isActive: true
-  });
-
-  alert("Plan Renewed Successfully");
-  location.reload();
+window.renewPlan = () => {
+  window.location.href = "pricing.html?plan=basic";
 };
 
-window.upgradePlan = async () => {
-
-  const user = auth.currentUser;
-  const userRef = doc(db, "users", user.uid);
-
-  await updateDoc(userRef, {
-    plan: "pro",
-    planExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-    remainingMessages: 5000,
-    isActive: true
-  });
-
-  alert("Upgraded to Pro");
-  location.reload();
+window.upgradePlan = () => {
+  window.location.href = "pricing.html?plan=pro";
 };
+
 </script>
 
 <!-- ================= API KEY + WIDGET ================= -->
