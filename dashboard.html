@@ -216,6 +216,7 @@ if(!businessId){
 
 <!-- FIREBASE AUTH + DASHBOARD LOGIC -->
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
@@ -229,8 +230,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
- 
-  onAuthStateChanged(auth, async (user) => {
+
+let businessId = null;
+
+
+// ================= AUTH =================
+
+onAuthStateChanged(auth, async (user) => {
 
   if (!user) {
     window.location.href = "login.html";
@@ -240,54 +246,40 @@ const db = getFirestore(app);
   document.getElementById("userEmail").innerText = user.email;
 
   const userRef = doc(db, "users", user.uid);
-  const snap = await getDoc(userRef);
+  const userSnap = await getDoc(userRef);
 
-  if (!snap.exists()) return;
+  if (!userSnap.exists()) return;
 
-  const data = snap.data();
+  const userData = userSnap.data();
 
-  const businessId = data.businessId;
+  businessId = userData.businessId;
   window.businessId = businessId;
 
-  const businessRef = doc(db, "businesses", businessId);
-  const businessSnap = await getDoc(businessRef);
+  // PLAN
+  document.getElementById("userPlan").innerText = userData.plan || "No Plan";
 
-  if (!businessSnap.exists()) return;
+  // BILLING
+  initBilling(userData);
 
-  const business = businessSnap.data();
-
-  const expiry = business.expiry ? new Date(business.expiry) : null;
-  const now = new Date();
-  const isExpired = expiry && now > expiry;
-
-  document.getElementById("userPlan").innerText =
-    isExpired ? "Expired" : data.plan;
+  // USAGE
+  loadUsage();
+  
+  // BUSINESS INFO
+  loadBusinessInfo(); 
 
 });
 
-  // ================= USAGE =================
 
-  const usageRef = doc(db, "usage", businessId);
+// ================= USAGE =================
+
+async function loadUsage(){
+
+  if(!businessId) return;
+
+  const usageRef = doc(db,"usage",businessId);
   const usageSnap = await getDoc(usageRef);
 
-  if (usageSnap.exists()) {
-
-    const usage = usageSnap.data();
-
-    const remaining =
-      usage.messageLimit - usage.messagesUsed;
-
-    document.getElementById("remainingMessages").innerText = remaining;
-
-  }
-
-});
-
-  
-const usageRef = doc(db, "usage", businessId);
-const usageSnap = await getDoc(usageRef);
-
-if (usageSnap.exists()) {
+  if(!usageSnap.exists()) return;
 
   const usage = usageSnap.data();
 
@@ -297,76 +289,129 @@ if (usageSnap.exists()) {
   document.getElementById("remainingMessages").innerText = remaining;
 
 }
-// ================= BUSINESS FORM =================
-const form = document.getElementById("businessForm");
+// ================= LOAD BUSINESS INFO =================
 
-if (form) {
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+async function loadBusinessInfo(){
 
-    if (!window.businessId) {
-      alert("Business ID not loaded yet");
-      return;
-    }
+  if(!businessId) return;
 
-    const businessRef = doc(db, "businesses", window.businessId);
+  const businessRef = doc(db,"businesses",businessId);
+  const snap = await getDoc(businessRef);
 
-    await updateDoc(businessRef, {
-      companyName: document.getElementById("companyName").value,
-      service: document.getElementById("service").value,
-      customPrompt: document.getElementById("customPrompt").value,
-      websiteData: document.getElementById("websiteData").value,
-    });
+  if(!snap.exists()) return;
 
-    alert("Business Profile Updated 🚀");
-  });
-}
-
-// ================= LOGOUT =================
-const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-  logoutBtn.onclick = () =>
-    signOut(auth).then(() => location.href = "login.html");
-}
-
-// ================= BILLING SYSTEM =================
-  
-  async function initBilling(user) {
-
-  const userRef = doc(db, "users", user.uid);
-  const snap = await getDoc(userRef);
   const data = snap.data();
 
-  const expiry = data.planExpiry?.toDate();
+  document.getElementById("companyName").value =
+    data.companyName || "";
+
+  document.getElementById("service").value =
+    data.service || "";
+
+  document.getElementById("customPrompt").value =
+    data.customPrompt || "";
+
+  document.getElementById("websiteData").value =
+    data.websiteData || "";
+
+}
+
+// ================= BILLING =================
+
+function initBilling(data){
+
+  const expiry = data.planExpiry?.toDate
+      ? data.planExpiry.toDate()
+      : new Date(data.planExpiry);
+
   const now = new Date();
   const expired = expiry && now > expiry;
 
-  document.getElementById("planName").innerText = data.plan;
+  document.getElementById("planName").innerText = data.plan || "No Plan";
+
   document.getElementById("planExpiry").innerText =
-    expiry ? expiry.toDateString() : "N/A";
-  document.getElementById("remainingMessages").innerText =
-    data.remainingMessages;
+      expiry ? expiry.toDateString() : "N/A";
 
   const actions = document.getElementById("billingActions");
-  actions.innerHTML = "";
+  actions.innerHTML="";
 
-  if (expired) {
+  if(expired){
+
     actions.innerHTML =
-      '<button onclick="renewPlan()" class="bg-red-600 px-4 py-2 rounded-lg w-full font-bold">Renew Plan</button>';
-  } else {
-    actions.innerHTML =
-      '<button onclick="renewPlan()" class="bg-green-600 px-4 py-2 rounded-lg font-bold">Renew</button>' +
-      (data.plan !== "pro"
-        ? '<button onclick="upgradePlan()" class="bg-indigo-600 px-4 py-2 rounded-lg font-bold ml-2">Upgrade</button>'
-        : '');
+    `<button onclick="renewPlan()" 
+    class="bg-red-600 px-4 py-2 rounded-lg w-full font-bold">
+    Renew Plan
+    </button>`;
+
   }
+
+  else{
+
+    actions.innerHTML =
+    `<button onclick="renewPlan()" 
+    class="bg-green-600 px-4 py-2 rounded-lg font-bold">
+    Renew
+    </button>`;
+
+  }
+
 }
-window.renewPlan = () => {
-  window.location.href = "pricing.html?plan=basic";
+
+
+// ================= BUSINESS FORM =================
+
+const form = document.getElementById("businessForm");
+
+if(form){
+
+form.addEventListener("submit",async(e)=>{
+
+  e.preventDefault();
+
+  if(!businessId){
+    alert("Business ID not loaded yet");
+    return;
+  }
+
+  const businessRef = doc(db,"businesses",businessId);
+
+  await updateDoc(businessRef,{
+
+    companyName:document.getElementById("companyName").value,
+    service:document.getElementById("service").value,
+    customPrompt:document.getElementById("customPrompt").value,
+    websiteData:document.getElementById("websiteData").value,
+
+  });
+
+  alert("Business Profile Updated 🚀");
+
+});
+
+}
+
+
+// ================= LOGOUT =================
+
+const logoutBtn = document.getElementById("logoutBtn");
+
+if(logoutBtn){
+
+logoutBtn.onclick=()=>{
+
+signOut(auth).then(()=>{
+location.href="login.html";
+});
+
 };
 
-window.upgradePlan = () => {
-  window.location.href = "pricing.html?plan=pro";
+}
+
+
+// ================= BILLING BUTTONS =================
+
+window.renewPlan=()=>{
+window.location.href="pricing.html";
 };
 
 </script>
