@@ -131,7 +131,7 @@ document.getElementById("loginBtn").onclick = async () => {
 
       await setDoc(userRef, {
         email: user.email,
-        plan: "trial",
+       planId: "trial",
         businessId: businessId,
         planExpiry: Date.now() + (7 * 24 * 60 * 60 * 1000),
         createdAt: serverTimestamp()
