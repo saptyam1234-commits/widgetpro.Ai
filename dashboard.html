@@ -36,10 +36,10 @@
         <p class="text-sm opacity-90">Business • Leads • AI • Billing</p>
       </div>
       <div class="text-right">
-        <span class="px-4 py-2 rounded-full bg-green-500 font-semibold">
-          ACTIVE
-        </span>
-        <p class="text-sm mt-1">Expiry: 25 Mar 2026</p>
+        <span id="planStatus"class="px-4 py-2 rounded-full bg-green-500 font-semibold">
+        ACTIVE
+       </span>
+      <p class="text-sm mt-1"> Expiry: <span id="headerExpiry"></span></p>
       </div>
     </div>
   </div>
@@ -260,7 +260,15 @@ onAuthStateChanged(auth, async (user) => {
 
   // BILLING
   initBilling(userData);
+  
+  const expiry = userData.planExpiry?.toDate
+  ? userData.planExpiry.toDate()
+  : new Date(userData.planExpiry);
 
+if (expiry) {
+  document.getElementById("headerExpiry").innerText =
+    expiry.toDateString();
+}
   // USAGE
   loadUsage();
   
