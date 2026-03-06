@@ -223,13 +223,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 onAuthStateChanged(auth, async (user) => {
 
   if (!user) {
     window.location.href = "login.html";
     return;
   }
+
+  // USER EMAIL SHOW
+  document.getElementById("userEmail").innerText = user.email;
 
   const userRef = doc(db, "users", user.uid);
   const snap = await getDoc(userRef);
@@ -239,8 +241,9 @@ onAuthStateChanged(auth, async (user) => {
   const data = snap.data();
 
   const businessId = data.businessId;
+  window.businessId = businessId;   // important
 
-  // load business plan
+  // LOAD BUSINESS
   const businessRef = doc(db, "businesses", businessId);
   const businessSnap = await getDoc(businessRef);
 
@@ -257,8 +260,9 @@ onAuthStateChanged(auth, async (user) => {
   document.getElementById("userPlan").innerText =
     isExpired ? "Expired" : business.plan;
 
-
 });
+
+  
 const usageRef = doc(db, "usage", businessId);
 const usageSnap = await getDoc(usageRef);
 
