@@ -215,11 +215,10 @@ if(!businessId){
 </script>
 
 <!-- FIREBASE AUTH + DASHBOARD LOGIC -->
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDJZf0H3YN9XoDDvIFOMtCo-FubyuGlHyA",
@@ -232,79 +231,106 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let businessId = null;
+let userData = null;
 
-// ================== AUTH & LOAD DASHBOARD ==================
+// ================= AUTH =================
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "login.html";
     return;
   }
 
-  document.getElementById("userEmail").innerText = user.email;
-
   const userRef = doc(db, "users", user.uid);
   const userSnap = await getDoc(userRef);
   if (!userSnap.exists()) return;
 
-  const userData = userSnap.data();
+  userData = userSnap.data();
   businessId = userData.businessId;
   window.businessId = businessId;
 
-  // ====== Load Plan ======
-  let planName = "No Plan";
-  let planExpiry = null;
+  // Show email
+  document.getElementById("userEmail").innerText = user.email;
 
-  if (userData.planId) {
-    const planRef = doc(db, "plans", userData.planId);
-    const planSnap = await getDoc(planRef);
-    if (planSnap.exists()) {
-      const planData = planSnap.data();
-      planName = planData?.name || "No Plan";
-    }
-  } else {
-    // fallback: use plan from user collection (trial)
-    planName = userData.plan || "No Plan";
+  // Load Business Data
+  await loadBusinessData();
+
+  // Load Plan & Billing
+  await loadPlanData();
+
+  // Load Usage
+  await loadUsage();
+});
+
+// ================= BUSINESS DATA =================
+async function loadBusinessData() {
+  if (!businessId) return;
+
+  const businessRef = doc(db, "businesses", businessId);
+  const businessSnap = await getDoc(businessRef);
+  if (!businessSnap.exists()) return;
+
+  const business = businessSnap.data();
+
+  // Prefill form fields
+  document.getElementById("companyName").value = business.companyName || "";
+  document.getElementById("service").value = business.service || "";
+  document.getElementById("customPrompt").value = business.customPrompt || "";
+  document.getElementById("websiteData").value = business.websiteData || "";
+}
+
+// ================= PLAN DATA =================
+async function loadPlanData() {
+  if (!userData) return;
+
+  let planId = userData.planId || userData.plan; // planId stored in user or plan name
+  if (!planId) {
+    document.getElementById("userPlan").innerText = "No Plan";
+    return;
   }
 
-  document.getElementById("userPlan").innerText = planName;
+  // Fetch plan from Plans collection
+  const plansRef = collection(db, "plans");
+  const q = query(plansRef, where("name", "==", planId));
+  const planSnap = await getDocs(q);
 
-  // ====== Plan Expiry Safe Check ======
-  if (userData.planExpiry?.toDate) {
-    planExpiry = userData.planExpiry.toDate();
-  } else if (userData.planExpiry) {
-    planExpiry = new Date(userData.planExpiry);
+  if (planSnap.empty) {
+    document.getElementById("userPlan").innerText = planId;
+    return;
+  }
+
+  const plan = planSnap.docs[0].data();
+
+  // Set plan info in UI
+  document.getElementById("userPlan").innerText = plan.name || "No Plan";
+  document.getElementById("planName").innerText = plan.name || "No Plan";
+  document.getElementById("planPrice").innerText = plan.price || "0";
+  document.getElementById("remainingMessages").innerText = plan.messageLimit || 0;
+
+  // Calculate expiry
+  let expiry;
+  if (userData.planExpiry) {
+    expiry = userData.planExpiry.toDate ? userData.planExpiry.toDate() : new Date(userData.planExpiry);
+  } else if (userData.createdAt && plan.durationDays) {
+    expiry = new Date(userData.createdAt.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt));
+    expiry.setDate(expiry.getDate() + Number(plan.durationDays));
   }
 
   const now = new Date();
-  const isExpired = planExpiry ? now > planExpiry : false;
+  const expired = expiry && now > expiry;
 
-  if (isExpired) {
-    document.getElementById("userPlan").innerText = "Expired";
-    // optionally update in Firestore
-    await updateDoc(userRef, { isActive: false });
+  document.getElementById("planExpiry").innerText = expiry ? expiry.toDateString() : "N/A";
+
+  // Billing Actions
+  const actions = document.getElementById("billingActions");
+  actions.innerHTML = "";
+  if (expired) {
+    actions.innerHTML = `<button onclick="renewPlan()" class="bg-red-600 px-4 py-2 rounded-lg w-full font-bold">Renew Plan</button>`;
+  } else {
+    actions.innerHTML = `<button onclick="renewPlan()" class="bg-green-600 px-4 py-2 rounded-lg font-bold">Renew</button>`;
   }
+}
 
-  // ====== Load Usage ======
-  loadUsage();
-
-  // ====== Load Business Info ======
-  if (businessId) {
-    const businessRef = doc(db, "businesses", businessId);
-    const businessSnap = await getDoc(businessRef);
-    if (businessSnap.exists()) {
-      const business = businessSnap.data();
-      document.getElementById("companyName").value = business.companyName || "";
-      document.getElementById("service").value = business.service || "";
-      document.getElementById("customPrompt").value = business.customPrompt || "";
-      document.getElementById("websiteData").value = business.websiteData || "";
-    }
-  }
-
-  // ====== Init Billing ======
-  initBilling(userData, planExpiry);
-});
-
-// ================== USAGE ==================
+// ================= USAGE =================
 async function loadUsage() {
   if (!businessId) return;
 
@@ -317,36 +343,12 @@ async function loadUsage() {
   document.getElementById("remainingMessages").innerText = remaining;
 }
 
-// ================== BILLING ==================
-function initBilling(userData, planExpiry) {
-  const now = new Date();
-  const expired = planExpiry ? now > planExpiry : false;
-
-  document.getElementById("planName").innerText = userData.plan || "No Plan";
-  document.getElementById("planExpiry").innerText = planExpiry ? planExpiry.toDateString() : "N/A";
-  document.getElementById("remainingMessages").innerText = userData.remainingMessages || 0;
-
-  const actions = document.getElementById("billingActions");
-  actions.innerHTML = "";
-
-  if (expired) {
-    actions.innerHTML =
-      '<button onclick="renewPlan()" class="bg-red-600 px-4 py-2 rounded-lg w-full font-bold">Renew Plan</button>';
-  } else {
-    actions.innerHTML =
-      '<button onclick="renewPlan()" class="bg-green-600 px-4 py-2 rounded-lg font-bold">Renew</button>';
-  }
-}
-
-// ================== BUSINESS FORM ==================
+// ================= BUSINESS FORM =================
 const form = document.getElementById("businessForm");
 if (form) {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (!businessId) {
-      alert("Business ID not loaded yet");
-      return;
-    }
+    if (!businessId) return alert("Business ID not loaded yet");
 
     const businessRef = doc(db, "businesses", businessId);
     await updateDoc(businessRef, {
@@ -360,17 +362,17 @@ if (form) {
   });
 }
 
-// ================== LOGOUT ==================
+// ================= LOGOUT =================
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
-  logoutBtn.onclick = () => signOut(auth).then(() => window.location.href = "login.html");
+  logoutBtn.onclick = () => signOut(auth).then(() => location.href = "login.html");
 }
 
-// ================== BILLING BUTTONS ==================
+// ================= BILLING BUTTONS =================
 window.renewPlan = () => {
   window.location.href = "pricing.html";
 };
-
+  
 // ================== API KEY / WIDGET ==================
 async function generateKey() {
   const key = "api_" + Math.random().toString(36).substring(2, 18);
