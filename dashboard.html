@@ -206,7 +206,13 @@
   }
   showSlide(0);
 </script>
+<script>
+const businessId = localStorage.getItem("businessId");
 
+if(!businessId){
+  window.location.href = "login.html";
+}
+</script>
 
 <!-- FIREBASE AUTH + DASHBOARD LOGIC -->
 <script type="module">
