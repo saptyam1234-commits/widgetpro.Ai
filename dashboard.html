@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Dashboard | ChatWidgetPro</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard | ChatWidgetPro</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-900 font-roboto text-gray-100 min-h-screen">
@@ -25,6 +25,7 @@
   </div>
 </header>
 
+<!-- MAIN CONTAINER -->
 <section class="container mx-auto py-8 px-6">
 
   <!-- DASHBOARD HEADER -->
@@ -35,27 +36,39 @@
         <p class="text-sm opacity-90">Business • Leads • AI • Billing</p>
       </div>
       <div class="text-right">
-        <span id="planStatus" class="px-4 py-2 rounded-full bg-green-500 font-semibold">ACTIVE</span>
-        <p class="text-sm mt-1">Expiry: <span id="planExpiry">N/A</span></p>
+        <span class="px-4 py-2 rounded-full bg-green-500 font-semibold">
+          ACTIVE
+        </span>
+        <p class="text-sm mt-1">Expiry: 25 Mar 2026</p>
       </div>
     </div>
   </div>
 
   <!-- TABS -->
   <div class="flex flex-wrap gap-3 mb-6">
-    <button onclick="showSlide(0)" class="tab-btn">Overview</button>
-    <button onclick="showSlide(1)" class="tab-btn">Leads</button>
-    <button onclick="showSlide(2)" class="tab-btn">Follow-Ups</button>
-    <button onclick="showSlide(3)" class="tab-btn">Business Info</button>
-    <button onclick="showSlide(4)" class="tab-btn">Plans & Billing</button>
+    <button onclick="showSlide(0)" class="tab-btn bg-gray-800 hover:bg-indigo-600">Overview</button>
+    <button onclick="showSlide(1)" class="tab-btn bg-gray-800 hover:bg-indigo-600">Leads</button>
+    <button onclick="showSlide(2)" class="tab-btn bg-gray-800 hover:bg-indigo-600">Follow-Ups</button>
+    <button onclick="showSlide(3)" class="tab-btn bg-gray-800 hover:bg-indigo-600">Business Info</button>
+    <button onclick="showSlide(4)" class="tab-btn bg-gray-800 hover:bg-indigo-600">Plans & Billing</button>
   </div>
 
   <!-- SLIDES -->
+
+  <!-- OVERVIEW -->
   <div class="slide">
+    <!-- STATS -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="stat-card bg-black/70 backdrop-blur-lg">Total Leads<br><b>120</b></div>
+      <div class="stat-card bg-black/70 backdrop-blur-lg">New Today<br><b>12</b></div>
+      <div class="stat-card bg-black/70 backdrop-blur-lg">Pending Follow-ups<br><b>8</b></div>
+      <div class="stat-card bg-black/70 backdrop-blur-lg">Converted<br><b>45</b></div>
+    </div>
+
     <!-- USER INFO -->
     <div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6 mb-6">
       <p><b>Email:</b> <span id="userEmail"></span></p>
-      <p><b>Current Plan:</b> <span id="userPlan" class="text-green-400"></span></p>
+      <p><b>Current Plan:</b> <span id="userPlan" class="text-green-400"></span>
     </div>
 
     <!-- API KEY -->
@@ -63,7 +76,8 @@
       <h2 class="text-xl font-bold mb-3">Your API Key</h2>
       <div class="flex gap-3">
         <input id="apiKey" readonly class="w-full p-3 border rounded bg-gray-800 text-gray-200">
-        <button onclick="generateKey()" class="bg-indigo-600 hover:bg-indigo-700 transition px-4 rounded-lg font-bold text-white">
+        <button onclick="generateKey()"
+          class="bg-indigo-600 hover:bg-indigo-700 transition px-4 rounded-lg font-bold text-white">
           Generate
         </button>
       </div>
@@ -72,55 +86,134 @@
     <!-- WIDGET CODE -->
     <div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6">
       <h2 class="text-xl font-bold mb-3">Widget Code</h2>
-      <textarea id="widgetCode" rows="4" readonly class="w-full p-3 border rounded bg-gray-800 text-gray-200"></textarea>
-      <button onclick="copyCode()" class="mt-3 bg-green-600 hover:bg-green-700 transition px-6 py-2 rounded-lg font-bold text-white">
+      <textarea id="widgetCode" rows="4" readonly
+        class="w-full p-3 border rounded bg-gray-800 text-gray-200"></textarea>
+      <button onclick="copyCode()"
+        class="mt-3 bg-green-600 hover:bg-green-700 transition px-6 py-2 rounded-lg font-bold text-white">
         Copy Code
       </button>
     </div>
   </div>
 
+  <!-- LEADS -->
+  <div class="slide hidden">
+    <h2 class="text-xl font-bold mb-4">Lead Management</h2>
+    <table class="w-full bg-black/70 backdrop-blur-lg rounded-2xl shadow text-gray-200">
+      <tr class="bg-gray-800">
+        <th class="p-2">Name</th>
+        <th class="p-2">Phone</th>
+        <th class="p-2">Status</th>
+        <th class="p-2">Follow-up</th>
+      </tr>
+      <tr>
+        <td class="p-2">Rahul</td>
+        <td class="p-2">9876543210</td>
+        <td class="p-2">Interested</td>
+        <td class="p-2">Tomorrow</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- FOLLOW UPS -->
+  <div class="slide hidden">
+    <h2 class="text-xl font-bold mb-4">Follow-Up Dashboard</h2>
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="stat-card bg-black/70 backdrop-blur-lg">Today<br><b>5</b></div>
+      <div class="stat-card bg-black/70 backdrop-blur-lg">Upcoming<br><b>10</b></div>
+      <div class="stat-card bg-black/70 backdrop-blur-lg text-red-400">Missed<br><b>2</b></div>
+    </div>
+  </div>
+
   <!-- BUSINESS INFO -->
   <div class="slide hidden">
-    <h2 class="text-2xl font-bold mb-6">Business Information</h2>
-    <form id="businessForm" class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6 mb-4">
-      <input id="companyName" class="p-3 border rounded w-full mb-3 bg-gray-800 text-gray-200" placeholder="Business Name">
-      <input id="service" class="p-3 border rounded w-full mb-3 bg-gray-800 text-gray-200" placeholder="Working Hours">
-      <textarea id="customPrompt" class="p-3 border rounded w-full mb-3 bg-gray-800 text-gray-200" placeholder="Custom AI Prompt"></textarea>
-      <textarea id="websiteData" class="p-3 border rounded w-full bg-gray-800 text-gray-200" placeholder="Products / Services"></textarea>
-      <button type="submit" class="mt-4 bg-indigo-600 hover:bg-indigo-700 transition px-6 py-3 rounded-lg font-bold text-white w-full">
-        Save Business Info
-      </button>
-    </form>
-  </div>
+  <h2 class="text-2xl font-bold mb-6">Business Information</h2>
+
+  <form id="businessForm"
+    class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6 mb-4">
+
+    <input id="companyName"
+      class="p-3 border rounded w-full mb-3 bg-gray-800 text-gray-200"
+      placeholder="Business Name">
+
+    <input id="service"
+      class="p-3 border rounded w-full mb-3 bg-gray-800 text-gray-200"
+      placeholder="Working Hours">
+
+    <textarea id="customPrompt"
+      class="p-3 border rounded w-full mb-3 bg-gray-800 text-gray-200"
+      placeholder="Custom AI Prompt"></textarea>
+
+    <textarea id="websiteData"
+      class="p-3 border rounded w-full bg-gray-800 text-gray-200"
+      placeholder="Products / Services"></textarea>
+
+    <button type="submit"
+      class="mt-4 bg-indigo-600 hover:bg-indigo-700 transition px-6 py-3 rounded-lg font-bold text-white w-full">
+      Save Business Info
+    </button>
+
+  </form>
+</div>
 
   <!-- BILLING -->
   <div class="slide hidden" id="billingSlide">
     <h2 class="text-xl font-bold mb-4">Plans & Billing</h2>
+
     <div class="stat-card bg-black/70 backdrop-blur-lg mb-3">
-      Current Plan: <span id="planName" class="font-bold text-indigo-400">N/A</span>
+      Current Plan: <span id="planName" class="font-bold text-indigo-400">Basic</span>
     </div>
     <div class="stat-card bg-black/70 backdrop-blur-lg mb-3">
-      Remaining Messages: <span id="remainingMessages">0</span>
+      Price: ₹<span id="planPrice">999</span>/month
+    </div>
+    <div class="stat-card bg-black/70 backdrop-blur-lg mb-3">
+      Remaining Messages: <span id="remainingMessages">55</span>
     </div>
     <div class="stat-card bg-black/70 backdrop-blur-lg mb-4">
-      Expires On: <span id="planExpiry" class="font-bold text-red-500">N/A</span>
+      Expires On: <span id="planExpiry" class="font-bold text-red-500">28 Feb 2026</span>
     </div>
+
     <div class="flex gap-4" id="billingActions"></div>
   </div>
+
 </section>
 
+<!-- STYLES -->
 <style>
-.tab-btn { padding:10px 18px; border-radius:10px; font-weight:600; background:#1f2937; transition:all 0.3s; }
-.tab-btn:hover{ background:#4f46e5; color:white; }
-.stat-card{ padding:20px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.3); text-align:center; }
+  .tab-btn{
+    padding:10px 18px;
+    border-radius:10px;
+    font-weight:600;
+    background:#1f2937;
+    transition:all 0.3s;
+  }
+  .tab-btn:hover{
+    background:#4f46e5;
+    color:white;
+  }
+  .stat-card{
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 12px rgba(0,0,0,.3);
+    text-align:center;
+  }
 </style>
 
+<!-- SLIDE LOGIC -->
 <script>
-const slides = document.querySelectorAll(".slide");
-function showSlide(i){ slides.forEach((s,idx)=>s.classList.toggle("hidden", idx!==i)); }
-showSlide(0);
+  const slides = document.querySelectorAll(".slide");
+  function showSlide(i){
+    slides.forEach((s,idx)=>s.classList.toggle("hidden", idx!==i));
+  }
+  showSlide(0);
 </script>
+<script>
+const businessId = localStorage.getItem("businessId");
 
+if(!businessId){
+  window.location.href = "login.html";
+}
+</script>
+<!-- FIREBASE AUTH + DASHBOARD LOGIC -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
