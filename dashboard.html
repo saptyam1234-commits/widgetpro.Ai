@@ -55,14 +55,32 @@
 
   <!-- OVERVIEW -->
   <div class="slide">
-    <!-- STATS -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-      <div class="stat-card bg-black/70 backdrop-blur-lg">Total Leads<br><b>120</b></div>
-      <div class="stat-card bg-black/70 backdrop-blur-lg">New Today<br><b>12</b></div>
-      <div class="stat-card bg-black/70 backdrop-blur-lg">Pending Follow-ups<br><b>8</b></div>
-      <div class="stat-card bg-black/70 backdrop-blur-lg">Converted<br><b>45</b></div>
-    </div>
+<h2 class="text-xl font-bold mb-4">Overview</h2>
 
+<div class="grid md:grid-cols-4 gap-4">
+
+<div class="stat-card bg-black/70 backdrop-blur-lg">
+Total Leads<br>
+<b id="totalLeads">0</b>
+</div>
+
+<div class="stat-card bg-black/70 backdrop-blur-lg">
+New Today<br>
+<b id="todayLeads">0</b>
+</div>
+
+<div class="stat-card bg-black/70 backdrop-blur-lg">
+Pending Followups<br>
+<b id="pendingFollowups">0</b>
+</div>
+
+<div class="stat-card bg-black/70 backdrop-blur-lg">
+Converted<br>
+<b id="convertedLeads">0</b>
+</div>
+
+</div>
+</div>
     <!-- USER INFO -->
     <div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6 mb-6">
       <p><b>Email:</b> <span id="userEmail"></span></p>
@@ -279,7 +297,7 @@ onAuthStateChanged(auth, async (user) => {
   await loadUsage();
   await loadLeads();
   await loadFollowups();
-
+  await loadOverview();
 
   const businessRef = doc(db, "businesses", businessId);
   const businessSnap = await getDoc(businessRef);
@@ -329,8 +347,14 @@ function initBilling(data) {
   const expired = expiry && now > expiry;
 
   document.getElementById("planName").innerText = data.plan || "No Plan";
-  document.getElementById("billingExpiry").innerText =
-    expiry ? expiry.toDateString() : "N/A";
+  const expiryText = expiry ? expiry.toDateString() : "N/A";
+
+document.getElementById("billingExpiry").innerText = expiryText;
+
+const headerExpiry = document.getElementById("planExpiry");
+if(headerExpiry){
+  headerExpiry.innerText = expiryText;
+}
 
   const actions = document.getElementById("billingActions");
 
@@ -487,7 +511,71 @@ async function loadFollowups() {
 
 }
 
+async function loadOverview() {
 
+  if (!businessId) return;
+
+  const q = query(
+    collection(db, "leads"),
+    where("businessId", "==", businessId)
+  );
+
+  const snap = await getDocs(q);
+
+  let total = 0;
+  let today = 0;
+  let pending = 0;
+  let converted = 0;
+
+  const todayDate = new Date();
+  todayDate.setHours(0,0,0,0);
+
+  snap.forEach(doc => {
+
+    const lead = doc.data();
+
+    total++;
+
+    if (lead.status === "converted") {
+      converted++;
+    }
+
+    if (lead.createdAt) {
+
+      const leadDate = lead.createdAt?.toDate
+        ? lead.createdAt.toDate()
+        : new Date(lead.createdAt);
+
+      leadDate.setHours(0,0,0,0);
+
+      if (leadDate.getTime() === todayDate.getTime()) {
+        today++;
+      }
+
+    }
+
+    if (lead.followupDate) {
+
+      const followDate = lead.followupDate?.toDate
+        ? lead.followupDate.toDate()
+        : new Date(lead.followupDate);
+
+      followDate.setHours(0,0,0,0);
+
+      if (followDate >= todayDate) {
+        pending++;
+      }
+
+    }
+
+  });
+
+  document.getElementById("totalLeads").innerText = total;
+  document.getElementById("todayLeads").innerText = today;
+  document.getElementById("pendingFollowups").innerText = pending;
+  document.getElementById("convertedLeads").innerText = converted;
+
+}
 
 window.generateKey = async function () {
 
