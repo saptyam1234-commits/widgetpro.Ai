@@ -36,10 +36,8 @@
         <p class="text-sm opacity-90">Business • Leads • AI • Billing</p>
       </div>
       <div class="text-right">
-        <span class="px-4 py-2 rounded-full bg-green-500 font-semibold">
-          ACTIVE
-        </span>
-        <p class="text-sm mt-1">Expiry: 25 Mar 2026</p>
+      <span id="planStatus" class="px-4 py-2 rounded-full bg-green-500 font-semibold">ACTIVE</span>
+        <p class="text-sm mt-1">Expiry: <span id="planExpiry">N/A</span></p>
       </div>
     </div>
   </div>
@@ -95,34 +93,54 @@
     </div>
   </div>
 
-  <!-- LEADS -->
-  <div class="slide hidden">
-    <h2 class="text-xl font-bold mb-4">Lead Management</h2>
-    <table class="w-full bg-black/70 backdrop-blur-lg rounded-2xl shadow text-gray-200">
+<!-- LEADS -->
+<div class="slide hidden">
+  <h2 class="text-xl font-bold mb-4">Lead Management</h2>
+
+  <table class="w-full bg-black/70 backdrop-blur-lg rounded-2xl shadow text-gray-200">
+    <thead>
       <tr class="bg-gray-800">
         <th class="p-2">Name</th>
         <th class="p-2">Phone</th>
         <th class="p-2">Status</th>
         <th class="p-2">Follow-up</th>
       </tr>
+    </thead>
+
+    <tbody id="leadsTable">
       <tr>
-        <td class="p-2">Rahul</td>
-        <td class="p-2">9876543210</td>
-        <td class="p-2">Interested</td>
-        <td class="p-2">Tomorrow</td>
+        <td colspan="4" class="p-4 text-center text-gray-400">
+          Loading leads...
+        </td>
       </tr>
-    </table>
-  </div>
+    </tbody>
+
+  </table>
+</div>
 
   <!-- FOLLOW UPS -->
-  <div class="slide hidden">
-    <h2 class="text-xl font-bold mb-4">Follow-Up Dashboard</h2>
-    <div class="grid md:grid-cols-3 gap-4">
-      <div class="stat-card bg-black/70 backdrop-blur-lg">Today<br><b>5</b></div>
-      <div class="stat-card bg-black/70 backdrop-blur-lg">Upcoming<br><b>10</b></div>
-      <div class="stat-card bg-black/70 backdrop-blur-lg text-red-400">Missed<br><b>2</b></div>
+<div class="slide hidden">
+  <h2 class="text-xl font-bold mb-4">Follow-Up Dashboard</h2>
+
+  <div class="grid md:grid-cols-3 gap-4">
+
+    <div class="stat-card bg-black/70 backdrop-blur-lg">
+      Today<br>
+      <b id="todayFollowups">0</b>
     </div>
+
+    <div class="stat-card bg-black/70 backdrop-blur-lg">
+      Upcoming<br>
+      <b id="upcomingFollowups">0</b>
+    </div>
+
+    <div class="stat-card bg-black/70 backdrop-blur-lg text-red-400">
+      Missed<br>
+      <b id="missedFollowups">0</b>
+    </div>
+
   </div>
+</div>
 
   <!-- BUSINESS INFO -->
   <div class="slide hidden">
@@ -246,6 +264,12 @@ onAuthStateChanged(auth, async (user) => {
   // USAGE
   loadUsage();
 
+  // lead 
+  await loadLeads();
+
+// follow up
+  await loadFollowups();
+  
   // PREFILL BUSINESS INFO
   const businessRef = doc(db,"businesses",businessId);
   const businessSnap = await getDoc(businessRef);
@@ -308,6 +332,94 @@ document.getElementById("logoutBtn").onclick = ()=> signOut(auth).then(()=> loca
 // BILLING BUTTON
 window.renewPlan = ()=> window.location.href="pricing.html";
 
+ // Lead Load 
+  import { collection, query, where, getDocs } 
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+
+async function loadLeads(){
+
+  if(!businessId) return;
+
+  const leadsTable = document.getElementById("leadsTable");
+  leadsTable.innerHTML = "Loading...";
+
+  const q = query(
+    collection(db,"leads"),
+    where("businessId","==",businessId)
+  );
+
+  const snap = await getDocs(q);
+
+  if(snap.empty){
+    leadsTable.innerHTML =
+      `<tr><td colspan="4" class="p-4 text-center">No leads yet</td></tr>`;
+    return;
+  }
+
+  leadsTable.innerHTML = "";
+
+  snap.forEach(doc => {
+
+    const lead = doc.data();
+
+    leadsTable.innerHTML += `
+      <tr class="border-t border-gray-700">
+        <td class="p-2">${lead.name || "-"}</td>
+        <td class="p-2">${lead.phone || "-"}</td>
+        <td class="p-2">${lead.status || "-"}</td>
+        <td class="p-2">${lead.followup || "-"}</td>
+      </tr>
+    `;
+
+  });
+
+}
+ 
+  // FOLLOW UPS
+ async function loadFollowups(){
+
+  if(!businessId) return;
+
+  const q = query(
+    collection(db,"leads"),
+    where("businessId","==",businessId)
+  );
+
+  const snap = await getDocs(q);
+
+  let today = 0;
+  let upcoming = 0;
+  let missed = 0;
+
+  const todayDate = new Date();
+  todayDate.setHours(0,0,0,0);
+
+  snap.forEach(doc => {
+
+    const lead = doc.data();
+    if(!lead.followupDate) return;
+
+    const followDate = new Date(lead.followupDate);
+    followDate.setHours(0,0,0,0);
+
+    if(followDate.getTime() === todayDate.getTime()){
+      today++;
+    }
+    else if(followDate > todayDate){
+      upcoming++;
+    }
+    else if(followDate < todayDate){
+      missed++;
+    }
+
+  });
+
+  document.getElementById("todayFollowups").innerText = today;
+  document.getElementById("upcomingFollowups").innerText = upcoming;
+  document.getElementById("missedFollowups").innerText = missed;
+
+}
 // API KEY + WIDGET
 window.generateKey = async function(){
   if(!window.businessId) return alert("Business ID not loaded yet");
@@ -327,7 +439,6 @@ window.generateKey = async function(){
     }
   }catch(err){ console.error(err); alert("Server error"); }
 };
-
 window.copyCode = function(){
   const codeElement = document.getElementById("widgetCode");
   navigator.clipboard.writeText(codeElement.value).then(()=>alert("Code copied!")).catch(console.error);
