@@ -54,11 +54,11 @@
   <!-- SLIDES -->
 
   <!-- OVERVIEW -->
+<!-- OVERVIEW -->
 <div class="slide">
 
 <!-- STATS -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-
 <div class="stat-card bg-black/70 backdrop-blur-lg">
 Total Leads<br><b id="totalLeads">0</b>
 </div>
@@ -74,39 +74,37 @@ Pending Follow-ups<br><b id="pendingFollowups">0</b>
 <div class="stat-card bg-black/70 backdrop-blur-lg">
 Converted<br><b id="convertedLeads">0</b>
 </div>
+</div>
 
+<!-- USER INFO -->
+<div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6 mb-6">
+<p><b>Email:</b> <span id="userEmail"></span></p>
+<p><b>Current Plan:</b> <span id="userPlan" class="text-green-400"></span></p>
+</div>
+
+<!-- API KEY -->
+<div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6 mb-6">
+<h2 class="text-xl font-bold mb-3">Your API Key</h2>
+<div class="flex gap-3">
+<input id="apiKey" readonly class="w-full p-3 border rounded bg-gray-800 text-gray-200">
+<button onclick="generateKey()" class="bg-indigo-600 hover:bg-indigo-700 transition px-4 rounded-lg font-bold text-white">
+Generate
+</button>
 </div>
 </div>
 
-    <!-- USER INFO -->
-    <div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6 mb-6">
-      <p><b>Email:</b> <span id="userEmail"></span></p>
-      <p><b>Current Plan:</b> <span id="userPlan" class="text-green-400"></span>
-    </div>
+<!-- WIDGET CODE -->
+<div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6">
+<h2 class="text-xl font-bold mb-3">Widget Code</h2>
+<textarea id="widgetCode" rows="4" readonly
+class="w-full p-3 border rounded bg-gray-800 text-gray-200"></textarea>
+<button onclick="copyCode()"
+class="mt-3 bg-green-600 hover:bg-green-700 transition px-6 py-2 rounded-lg font-bold text-white">
+Copy Code
+</button>
+</div>
 
-    <!-- API KEY -->
-    <div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6 mb-6">
-      <h2 class="text-xl font-bold mb-3">Your API Key</h2>
-      <div class="flex gap-3">
-        <input id="apiKey" readonly class="w-full p-3 border rounded bg-gray-800 text-gray-200">
-        <button onclick="generateKey()"
-          class="bg-indigo-600 hover:bg-indigo-700 transition px-4 rounded-lg font-bold text-white">
-          Generate
-        </button>
-      </div>
-    </div>
-
-    <!-- WIDGET CODE -->
-    <div class="bg-black/70 backdrop-blur-lg rounded-2xl shadow p-6">
-      <h2 class="text-xl font-bold mb-3">Widget Code</h2>
-      <textarea id="widgetCode" rows="4" readonly
-        class="w-full p-3 border rounded bg-gray-800 text-gray-200"></textarea>
-      <button onclick="copyCode()"
-        class="mt-3 bg-green-600 hover:bg-green-700 transition px-6 py-2 rounded-lg font-bold text-white">
-        Copy Code
-      </button>
-    </div>
-  </div>
+</div>
 
 <!-- LEADS -->
 <div class="slide hidden">
