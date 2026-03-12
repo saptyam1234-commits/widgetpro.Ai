@@ -370,34 +370,34 @@ if(headerExpiry){
 }
 
 
-
 const form = document.getElementById("businessForm");
 
-if (form) {
+if(form){
 
-  form.addEventListener("submit", async (e) => {
+form.addEventListener("submit",async(e)=>{
 
-    e.preventDefault();
+e.preventDefault();
 
-    if (!businessId) {
-      alert("Business ID not loaded");
-      return;
-    }
+if(!businessId){
+alert("Business ID not loaded yet");
+return;
+}
 
-    const businessRef = doc(db, "businesses", businessId);
+const businessRef = doc(db,"business profile",businessId);
 
-    await updateDoc(businessRef, {
+await setDoc(businessRef,{
 
-      companyName: document.getElementById("companyName").value,
-      service: document.getElementById("service").value,
-      customPrompt: document.getElementById("customPrompt").value,
-      websiteData: document.getElementById("websiteData").value,
+companyName:document.getElementById("companyName").value,
+service:document.getElementById("service").value,
+customPrompt:document.getElementById("customPrompt").value,
+websiteData:document.getElementById("websiteData").value,
+updatedAt:new Date()
 
-    });
+},{merge:true});
 
-    alert("Business Profile Updated 🚀");
+alert("Business Profile Saved 🚀");
 
-  });
+});
 
 }
 
