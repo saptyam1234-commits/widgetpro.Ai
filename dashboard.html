@@ -388,19 +388,17 @@ const businessRef = doc(db,"business profile",businessId);
 
 await setDoc(businessRef,{
 
-companyName:document.getElementById("companyName").value,
+businessName:document.getElementById("companyName").value,
 service:document.getElementById("service").value,
 customPrompt:document.getElementById("customPrompt").value,
 websiteData:document.getElementById("websiteData").value,
-updatedAt:new Date()
+
+uid: auth.currentUser.uid,
+businessId: businessId,
+updatedAt: new Date()
 
 },{merge:true});
 
-alert("Business Profile Saved 🚀");
-
-});
-
-}
 
 
 
