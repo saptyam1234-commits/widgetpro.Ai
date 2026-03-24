@@ -292,7 +292,7 @@ await loadUsage();
 await loadLeads();
 await loadFollowups();
 await loadOverview();
-
+await loadWidget();
 loadBusinessInfo();
 
 });
@@ -552,56 +552,114 @@ document.getElementById("convertedLeads").innerText=converted;
 
 
 
-window.generateKey=async function(){
+window.generateKey = async function(){
 
-const key="api_"+Math.random().toString(36).substring(2,18);
+  if(!businessId){
+    alert("Business ID missing");
+    return;
+  }
 
-document.getElementById("apiKey").value=key;
+  const widgetRef = doc(db,"widgets",businessId);
 
-try{
+  try{
 
-const res=await fetch(
-"https://backend-cyvm.onrender.com/api/widget/generate",
-{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-apiKey:key,
-businessId:businessId,
-domain:window.location.hostname
-})
+    // 🔹 1. Check existing key
+    const snap = await getDoc(widgetRef);
+
+    if(snap.exists()){
+
+      const data = snap.data();
+
+      document.getElementById("apiKey").value = data.apiKey;
+
+      document.getElementById("widgetCode").value =
+      `<script src="https://backend-cyvm.onrender.com/api/widget?key=${data.apiKey}"><\/script>`;
+
+      alert("Existing API Loaded ✅");
+
+      return;
+    }
+
+    // 🔹 2. Create new key
+    const key = "api_" + Math.random().toString(36).substring(2,18);
+
+    // 🔹 3. Save in Firestore
+    await setDoc(widgetRef,{
+      apiKey: key,
+      businessId: businessId,
+      uid: auth.currentUser.uid,
+      domain: window.location.hostname,
+      createdAt: new Date()
+    });
+
+    // 🔹 4. Backend call
+    const res = await fetch(
+      "https://backend-cyvm.onrender.com/api/widget/generate",
+      {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+          apiKey: key,
+          businessId: businessId,
+          domain: window.location.hostname
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    if(data.success){
+
+      document.getElementById("apiKey").value = key;
+
+      const snippet =
+      `<script src="https://backend-cyvm.onrender.com/api/widget?key=${key}"><\/script>`;
+
+      document.getElementById("widgetCode").value = snippet;
+
+      // 🔹 5. Save snippet also
+      await setDoc(widgetRef,{
+        snippetCode: snippet
+      },{merge:true});
+
+      alert("API Key Generated ✅");
+    }
+
+  }catch(err){
+    console.error(err);
+    alert("Error generating API");
+  }
+async function loadWidget(){
+
+  if(!businessId) return;
+
+  const widgetRef = doc(db,"widgets",businessId);
+  const snap = await getDoc(widgetRef);
+
+  if(!snap.exists()) return;
+
+  const data = snap.data();
+
+  document.getElementById("apiKey").value = data.apiKey;
+
+  document.getElementById("widgetCode").value = data.snippetCode || "";
 }
-);
-
-const data=await res.json();
-
-if(data.success){
-
-document.getElementById("widgetCode").value=
-`<script src="https://backend-cyvm.onrender.com/api/widget?key=${key}"><\/script>`;
-
-alert("Snippet Generated");
-
-}
-
-}catch(err){
-console.error(err);
-alert("Server error");
-}
-
-}
-
-
-
-window.copyCode=function(){
-
-const code=document.getElementById("widgetCode");
-
-navigator.clipboard.writeText(code.value)
-.then(()=>alert("Code Copied"));
-
+  
 };
 
+  window.copyCode = function(){
+
+  const code = document.getElementById("widgetCode").value;
+
+  if(!code){
+    alert("No code to copy");
+    return;
+  }
+
+  navigator.clipboard.writeText(code)
+  .then(()=>alert("Code Copied ✅"))
+  .catch(()=>alert("Copy failed"));
+};
 
 
 window.renewPlan=()=>{
