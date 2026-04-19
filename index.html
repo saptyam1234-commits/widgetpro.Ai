@@ -5,151 +5,680 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ChatWidgetPro | AI Chatbot for Websites</title>
 
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --red: #e11d48;
+      --red-dark: #9f1239;
+      --red-glow: rgba(225, 29, 72, 0.35);
+      --black: #050505;
+      --black-soft: #0f0f0f;
+      --black-card: #131313;
+      --border: rgba(225, 29, 72, 0.18);
+      --text-muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--black);
+      color: #f0f0f0;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE GRAIN OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.5;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 99px; }
+
+    /* ── NAVBAR ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 500;
+      background: rgba(5,5,5,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 18px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      color: #fff;
+      text-decoration: none;
+      position: relative;
+    }
+
+    .logo span {
+      color: var(--red);
+    }
+
+    nav a {
+      color: #aaa;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-decoration: none;
+      transition: color 0.2s;
+      margin-left: 36px;
+    }
+
+    nav a:hover { color: #fff; }
+
+    .nav-cta {
+      background: var(--red) !important;
+      color: #fff !important;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: background 0.25s, transform 0.2s, box-shadow 0.25s !important;
+      box-shadow: 0 0 20px var(--red-glow);
+    }
+
+    .nav-cta:hover {
+      background: var(--red-dark) !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 0 32px var(--red-glow) !important;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .hero-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.15;
+      filter: grayscale(40%) saturate(0.5);
+    }
+
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, var(--black) 45%, transparent 100%);
+    }
+
+    /* Red grid lines */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(225,29,72,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(225,29,72,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      z-index: 0;
+    }
+
+    /* Radial glow */
+    .hero-glow {
+      position: absolute;
+      top: 50%;
+      left: 20%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(225,29,72,0.12) 0%, transparent 70%);
+      z-index: 0;
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      50% { transform: translate(-50%, -50%) scale(1.08); opacity: 0.7; }
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 32px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 60px;
+      width: 100%;
+    }
+
+    .hero-left { flex: 1; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(225,29,72,0.12);
+      border: 1px solid rgba(225,29,72,0.3);
+      color: #f87171;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 99px;
+      margin-bottom: 28px;
+      width: fit-content;
+    }
+
+    .badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: blink 1.4s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      line-height: 1.0;
+      letter-spacing: 1px;
+      color: #fff;
+      margin-bottom: 24px;
+    }
+
+    .hero-title em {
+      font-style: normal;
+      color: var(--red);
+      position: relative;
+    }
+
+    .hero-sub {
+      color: #9ca3af;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      max-width: 480px;
+      margin-bottom: 40px;
+      font-weight: 300;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--red);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 16px 36px;
+      border-radius: 10px;
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 28px var(--red-glow);
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left 0.4s;
+    }
+
+    .btn-primary:hover::before { left: 100%; }
+    .btn-primary:hover {
+      background: var(--red-dark);
+      box-shadow: 0 0 40px rgba(225,29,72,0.5);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #ccc;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 16px 36px;
+      border-radius: 10px;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.12);
+      transition: all 0.25s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--red);
+      color: #fff;
+      background: rgba(225,29,72,0.06);
+    }
+
+    /* Hero right image */
+    .hero-right {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .hero-img-wrap {
+      position: relative;
+    }
+
+    .hero-img-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--red), transparent 60%);
+      z-index: -1;
+      opacity: 0.6;
+    }
+
+    .hero-img-wrap img {
+      border-radius: 22px;
+      width: 100%;
+      max-width: 500px;
+      border: 1px solid var(--border);
+      transition: transform 0.5s;
+      filter: brightness(0.9);
+    }
+
+    .hero-img-wrap img:hover { transform: scale(1.03); }
+
+    /* ── ABOUT ── */
+    .about-section {
+      padding: 120px 32px;
+      background: linear-gradient(to bottom, var(--black), var(--black-soft));
+      position: relative;
+    }
+
+    .section-label {
+      display: block;
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      text-align: center;
+      color: #fff;
+      letter-spacing: 1px;
+      margin-bottom: 60px;
+    }
+
+    .about-card {
+      max-width: 780px;
+      margin: 0 auto;
+      background: var(--black-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 52px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--red), transparent);
+    }
+
+    .about-card p {
+      color: #9ca3af;
+      font-size: 1.08rem;
+      line-height: 1.85;
+      font-weight: 300;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how-section {
+      padding: 120px 32px;
+      background: var(--black);
+    }
+
+    .steps-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .step-card {
+      background: var(--black-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 36px 28px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .step-card:hover {
+      border-color: var(--red);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(225,29,72,0.12);
+    }
+
+    .step-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 0;
+      background: linear-gradient(to top, rgba(225,29,72,0.05), transparent);
+      transition: height 0.3s;
+    }
+
+    .step-card:hover::after { height: 100%; }
+
+    .step-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem;
+      color: rgba(225,29,72,0.15);
+      line-height: 1;
+      position: absolute;
+      top: 12px; right: 20px;
+    }
+
+    .step-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+      letter-spacing: 0.3px;
+    }
+
+    .step-card p {
+      color: #6b7280;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .step-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(225,29,72,0.1);
+      border: 1px solid rgba(225,29,72,0.25);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 1.2rem;
+    }
+
+    /* Connector dots between cards */
+    .steps-grid .step-card:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -12px;
+      width: 20px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--red), transparent);
+      z-index: 5;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 120px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      background: var(--black-soft);
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 900px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(225,29,72,0.1) 0%, transparent 70%);
+    }
+
+    .cta-section h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      color: #fff;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .cta-section p {
+      color: #6b7280;
+      font-size: 1rem;
+      margin-bottom: 44px;
+      font-weight: 300;
+      position: relative;
+    }
+
+    .cta-section .btn-primary {
+      font-size: 1rem;
+      padding: 18px 52px;
+      border-radius: 12px;
+      position: relative;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--black);
+      border-top: 1px solid var(--border);
+      padding: 28px 32px;
+      text-align: center;
+      color: #374151;
+      font-size: 0.82rem;
+      letter-spacing: 0.3px;
+    }
+
+    footer span { color: var(--red); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero-inner { flex-direction: column-reverse; padding: 60px 20px; }
+      .hero-right { width: 100%; }
+      .steps-grid { grid-template-columns: repeat(2, 1fr); }
+      .about-card { padding: 36px 28px; }
+      .nav-inner { padding: 16px 20px; }
+    }
+
+    @media (max-width: 600px) {
+      .steps-grid { grid-template-columns: 1fr; }
+      nav a:not(.nav-cta) { display: none; }
+    }
+
+    /* ── ANIMATIONS ── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp 0.7s forwards;
+    }
+    .fade-up:nth-child(2) { animation-delay: 0.1s; }
+    .fade-up:nth-child(3) { animation-delay: 0.2s; }
+    .fade-up:nth-child(4) { animation-delay: 0.3s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 
-<body class="font-roboto bg-black text-white overflow-x-hidden">
+<body>
 
-<!-- NAVBAR -->
-<header class="bg-black/70 backdrop-blur-lg border-b border-gray-800 sticky top-0 z-50">
-  <div class="container mx-auto flex justify-between items-center p-5">
-    <a href="index.html" class="text-2xl font-bold text-indigo-400 tracking-wide">
-      ChatWidgetPro
-    </a>
+<!-- ═══════════════════════════════ NAVBAR ═══════════════════════════════ -->
+<header>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Chat<span>Widget</span>Pro</a>
 
-    <nav class="space-x-8 font-semibold text-gray-300">
-      <a href="index.html" class="hover:text-indigo-400 transition">Home</a>
-      <a href="#about" class="hover:text-indigo-400 transition">About</a>
-      <a href="pricing.html" class="hover:text-indigo-400 transition">Pricing</a>
-      <a href="login.html" class="hover:text-indigo-400 transition">Login</a>
-      <a href="signup.html"
-         class="bg-gradient-to-r from-indigo-600 to-indigo-800 px-5 py-2 rounded-xl text-white hover:scale-105 transition shadow-lg">
-        Get Started
-      </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="#about">About</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="login.html">Login</a>
+      <a href="signup.html" class="nav-cta">Get Started</a>
     </nav>
   </div>
 </header>
 
-<!-- HERO -->
-<section class="relative min-h-screen flex items-center">
+<!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+<section class="hero">
 
-  <!-- Background Image -->
-  <div class="absolute inset-0">
-    <img src="/mnt/data/WhatsApp Image 2026-02-11 at 6.08.43 PM.jpeg"
-         class="w-full h-full object-cover opacity-40">
-    <div class="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black"></div>
+  <div class="hero-bg">
+    <img src="/mnt/data/WhatsApp Image 2026-02-11 at 6.08.43 PM.jpeg" alt="">
   </div>
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
 
-  <!-- Content -->
-  <div class="relative container mx-auto flex flex-col-reverse md:flex-row items-center px-6 py-20">
+  <div class="hero-inner">
 
     <!-- LEFT -->
-    <div class="md:w-1/2 space-y-8">
-      <h1 class="text-5xl md:text-6xl font-bold leading-tight">
-        Add AI Chatbot to Your Website
-        <span class="text-indigo-400">in 5 Minutes</span>
+    <div class="hero-left">
+      <div class="badge fade-up">AI-Powered Widget</div>
+
+      <h1 class="hero-title fade-up">
+        Add AI Chatbot<br>
+        to Your Website<br>
+        <em>in 5 Minutes</em>
       </h1>
 
-      <p class="text-lg text-gray-300 max-w-lg">
+      <p class="hero-sub fade-up">
         Subscription-based chatbot widget for customer support,
         lead generation & automation — all from one powerful dashboard.
       </p>
 
-      <div class="flex gap-5">
-        <a href="signup.html"
-           class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold px-8 py-4 rounded-xl hover:scale-105 transition shadow-xl">
-          Start Free Trial
-        </a>
-
-        <a href="#about"
-           class="border border-gray-500 px-8 py-4 rounded-xl hover:bg-white hover:text-black transition">
-          Learn More
-        </a>
+      <div class="hero-btns fade-up">
+        <a href="signup.html" class="btn-primary">Start Free Trial</a>
+        <a href="#about" class="btn-secondary">Learn More</a>
       </div>
     </div>
 
-    <!-- RIGHT IMAGE -->
-    <div class="md:w-1/2 flex justify-center mb-12 md:mb-0">
-      <img src="/mnt/data/download (2).jfif"
-           class="rounded-3xl shadow-2xl border border-indigo-500/40 hover:scale-105 transition duration-500">
+    <!-- RIGHT -->
+    <div class="hero-right">
+      <div class="hero-img-wrap">
+        <img src="/mnt/data/download (2).jfif" alt="ChatWidgetPro Dashboard">
+      </div>
     </div>
 
   </div>
 </section>
 
-<!-- ABOUT -->
-<section id="about" class="py-24 bg-gradient-to-b from-black to-gray-900">
-  <div class="container mx-auto text-center px-6">
+<!-- ═══════════════════════════════ ABOUT ═══════════════════════════════ -->
+<section id="about" class="about-section">
+  <div style="max-width:1200px; margin:0 auto;">
+    <span class="section-label">Who we are</span>
+    <h2 class="section-title">About ChatWidgetPro</h2>
 
-    <h2 class="text-4xl font-bold text-indigo-400 mb-8">
-      About ChatWidgetPro
-    </h2>
-
-    <div class="max-w-3xl mx-auto bg-black/60 backdrop-blur-xl border border-gray-800 p-10 rounded-3xl shadow-2xl">
-      <p class="text-gray-300 text-lg leading-relaxed">
-        ChatWidgetPro helps businesses add an AI-powered chatbot
-        to their website using a simple script.
-        Manage conversations, subscriptions, usage and leads —
-        all from one premium dashboard.
+    <div class="about-card">
+      <p>
+        ChatWidgetPro helps businesses add an AI-powered chatbot to their website using a simple script.
+        Manage conversations, subscriptions, usage and leads — all from one premium dashboard.
+        Built for agencies, SaaS founders, and growth teams who need results fast.
       </p>
     </div>
-
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section class="py-24 bg-black">
-  <div class="container mx-auto px-6">
+<!-- ═══════════════════════════════ HOW IT WORKS ═══════════════════════════════ -->
+<section class="how-section">
+  <div style="max-width:1200px; margin:0 auto;">
+    <span class="section-label">Simple Process</span>
+    <h2 class="section-title">How It Works</h2>
 
-    <h2 class="text-4xl font-bold text-center text-indigo-400 mb-16">
-      How It Works
-    </h2>
+    <div class="steps-grid">
 
-    <div class="grid md:grid-cols-4 gap-8">
-
-      <div class="p-8 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl hover:scale-105 hover:border-indigo-500 transition">
-        <h3 class="font-bold text-xl mb-3">1. Signup</h3>
-        <p class="text-gray-400">Create your account instantly</p>
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <div class="step-icon">🔐</div>
+        <h3>Signup</h3>
+        <p>Create your account instantly and access your dashboard.</p>
       </div>
 
-      <div class="p-8 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl hover:scale-105 hover:border-indigo-500 transition">
-        <h3 class="font-bold text-xl mb-3">2. Choose Plan</h3>
-        <p class="text-gray-400">Select monthly subscription</p>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <div class="step-icon">💳</div>
+        <h3>Choose Plan</h3>
+        <p>Select a monthly subscription that fits your business needs.</p>
       </div>
 
-      <div class="p-8 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl hover:scale-105 hover:border-indigo-500 transition">
-        <h3 class="font-bold text-xl mb-3">3. Copy Code</h3>
-        <p class="text-gray-400">Paste widget script on site</p>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <div class="step-icon">📋</div>
+        <h3>Copy Code</h3>
+        <p>Paste the widget script on your site — one line of code.</p>
       </div>
 
-      <div class="p-8 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl hover:scale-105 hover:border-indigo-500 transition">
-        <h3 class="font-bold text-xl mb-3">4. Go Live</h3>
-        <p class="text-gray-400">Chatbot activates instantly 🚀</p>
+      <div class="step-card">
+        <div class="step-num">04</div>
+        <div class="step-icon">🚀</div>
+        <h3>Go Live</h3>
+        <p>Your AI chatbot activates instantly and starts engaging visitors.</p>
       </div>
 
     </div>
   </div>
 </section>
 
-<!-- CTA -->
-<section class="py-24 bg-gradient-to-r from-indigo-900 via-black to-indigo-900 text-center">
-  <h2 class="text-4xl font-bold mb-8 text-yellow-400">
-    Ready to Add AI Chatbot to Your Website?
-  </h2>
-
-  <a href="signup.html"
-     class="bg-yellow-400 text-black px-10 py-4 font-bold rounded-2xl hover:scale-105 transition shadow-2xl">
-    Create Free Account
-  </a>
+<!-- ═══════════════════════════════ CTA ═══════════════════════════════ -->
+<section class="cta-section">
+  <h2>Ready to Add AI to<br>Your Website?</h2>
+  <p>Join thousands of businesses already using ChatWidgetPro.</p>
+  <a href="signup.html" class="btn-primary">Create Free Account</a>
 </section>
 
-<!-- FOOTER -->
-<footer class="bg-black border-t border-gray-800 py-8 text-center text-gray-500">
-  © 2026 ChatWidgetPro. All rights reserved.
+<!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
+<footer>
+  © 2026 <span>ChatWidgetPro</span>. All rights reserved.
 </footer>
 
 <script src="https://backend-cyvm.onrender.com/api/widget" data-key="api_k30gi6voc5"></script>
