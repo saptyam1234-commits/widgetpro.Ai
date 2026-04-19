@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,75 +6,417 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login | ChatWidgetPro</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --red: #e11d48;
+      --red-dark: #9f1239;
+      --red-glow: rgba(225, 29, 72, 0.35);
+      --black: #050505;
+      --black-soft: #0f0f0f;
+      --black-card: #111111;
+      --border: rgba(225, 29, 72, 0.18);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--black);
+      color: #f0f0f0;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* grain */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.5;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 99px; }
+
+    /* ── NAVBAR ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 500;
+      background: rgba(5,5,5,0.88);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 18px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      color: #fff;
+      text-decoration: none;
+    }
+    .logo span { color: var(--red); }
+
+    nav a {
+      color: #888;
+      font-size: 0.88rem;
+      font-weight: 500;
+      letter-spacing: 0.4px;
+      text-decoration: none;
+      margin-left: 32px;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: #fff; }
+    nav a.active { color: var(--red); }
+
+    .nav-cta {
+      background: var(--red) !important;
+      color: #fff !important;
+      padding: 9px 22px;
+      border-radius: 8px;
+      font-weight: 600;
+      box-shadow: 0 0 18px var(--red-glow);
+      transition: all 0.25s !important;
+    }
+    .nav-cta:hover {
+      background: var(--red-dark) !important;
+      box-shadow: 0 0 30px var(--red-glow) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    /* ── PAGE BG ── */
+    .page-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Grid lines */
+    .page-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(225,29,72,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(225,29,72,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* Red glow */
+    .page-bg::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(225,29,72,0.09) 0%, transparent 65%);
+      animation: pulse 5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.1); }
+    }
+
+    /* ── MAIN SECTION ── */
+    .login-section {
+      position: relative;
+      z-index: 2;
+      min-height: calc(100vh - 64px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 20px;
+    }
+
+    /* ── CARD ── */
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--black-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 52px 44px;
+      position: relative;
+      overflow: hidden;
+      animation: slideUp 0.5s ease forwards;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* top red line */
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--red), transparent);
+    }
+
+    /* corner glow */
+    .login-card::after {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(225,29,72,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(225,29,72,0.1);
+      border: 1px solid rgba(225,29,72,0.25);
+      color: #f87171;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 99px;
+      margin-bottom: 24px;
+      width: fit-content;
+    }
+
+    .card-badge::before {
+      content: '';
+      width: 5px; height: 5px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: blink 1.4s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    .card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.6rem;
+      letter-spacing: 1px;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .card-sub {
+      color: #4b5563;
+      font-size: 0.88rem;
+      font-weight: 300;
+      margin-bottom: 36px;
+    }
+
+    /* ── INPUTS ── */
+    .input-group {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #4b5563;
+      margin-bottom: 8px;
+    }
+
+    .input-field {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      placeholder-color: #374151;
+    }
+
+    .input-field::placeholder { color: #374151; }
+
+    .input-field:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(225,29,72,0.1);
+      background: rgba(225,29,72,0.03);
+    }
+
+    /* forgot */
+    .forgot-link {
+      display: block;
+      text-align: right;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #6b7280;
+      text-decoration: none;
+      margin-top: -6px;
+      margin-bottom: 28px;
+      transition: color 0.2s;
+    }
+    .forgot-link:hover { color: var(--red); }
+
+    /* ── LOGIN BTN ── */
+    .btn-login {
+      width: 100%;
+      background: var(--red);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 24px var(--red-glow);
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .btn-login::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left 0.4s;
+    }
+
+    .btn-login:hover::before { left: 100%; }
+    .btn-login:hover {
+      background: var(--red-dark);
+      box-shadow: 0 0 38px rgba(225,29,72,0.5);
+      transform: translateY(-1px);
+    }
+
+    /* divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+    }
+    .divider span {
+      color: #374151;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* signup link */
+    .signup-prompt {
+      text-align: center;
+      font-size: 0.88rem;
+      color: #4b5563;
+    }
+    .signup-prompt a {
+      color: var(--red);
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .signup-prompt a:hover { color: #f87171; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .login-card { padding: 36px 24px; }
+      nav a:not(.nav-cta) { display: none; }
+      .nav-inner { padding: 16px 20px; }
+    }
+  </style>
 </head>
 
-<body class="bg-gray-900 font-roboto">
+<body>
 
-<!-- NAVBAR -->
-<header class="bg-black/80 backdrop-blur-md shadow-md sticky top-0 z-50">
-  <div class="container mx-auto flex justify-between items-center p-4">
-    
-    <!-- LOGO -->
-    <a href="index.html" class="text-2xl font-bold text-indigo-400">
-      ChatWidgetPro
-    </a>
-
-    <!-- LINKS -->
-    <nav class="space-x-6 text-gray-300 font-semibold">
-      <a href="index.html" class="hover:text-indigo-400">Home</a>
-      <a href="index.html#about" class="hover:text-indigo-400">About</a>
-      <a href="pricing.html" class="hover:text-indigo-400">Pricing</a>
-      <a href="login.html" class="text-indigo-400">Login</a>
-      <a href="signup.html"
-         class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-gradient-to-r hover:from-indigo-500 hover:to-indigo-700 transition-all">
-        Get Started
-      </a>
+<!-- ═══════════════════════════════ NAVBAR ═══════════════════════════════ -->
+<header>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Chat<span>Widget</span>Pro</a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="index.html#about">About</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="login.html" class="active">Login</a>
+      <a href="signup.html" class="nav-cta">Get Started</a>
     </nav>
   </div>
 </header>
 
-<!-- HERO + LOGIN SECTION -->
-<section class="relative min-h-[calc(100vh-80px)] flex items-center justify-center px-4"
-  style="background: url('your-high-quality-background.jpg') center/cover no-repeat;">
+<!-- ═══════════════════════════════ BG ═══════════════════════════════ -->
+<div class="page-bg"></div>
 
-  <!-- Overlay -->
-  <div class="absolute inset-0 bg-black/50"></div>
+<!-- ═══════════════════════════════ LOGIN SECTION ═══════════════════════════════ -->
+<section class="login-section">
 
-  <!-- LOGIN CARD -->
-  <div class="relative bg-black/70 backdrop-blur-lg shadow-2xl rounded-3xl p-10 w-full max-w-md text-gray-100">
-    <h2 class="text-3xl font-bold text-center text-indigo-400 mb-6">
-      Welcome Back
-    </h2>
+  <div class="login-card">
 
-    <input id="email" type="email" placeholder="Email"
-      class="w-full mb-4 p-4 rounded-xl border border-gray-600 bg-black/40 focus:ring-2 focus:ring-indigo-400 placeholder-gray-300 text-white">
+    <div class="card-badge">Secure Login</div>
 
-    <input id="password" type="password" placeholder="Password"
-      class="w-full mb-4 p-4 rounded-xl border border-gray-600 bg-black/40 focus:ring-2 focus:ring-indigo-400 placeholder-gray-300 text-white">
-  
-    <p class="text-right mb-4">
-      <a href="#" id="forgotPassword" class="text-indigo-400 text-sm font-semibold hover:underline">
-        Forgot Password?
-      </a>
+    <h2 class="card-title">Welcome Back</h2>
+    <p class="card-sub">Sign in to your ChatWidgetPro dashboard</p>
+
+    <div class="input-group">
+      <label class="input-label">Email Address</label>
+      <input id="email" type="email" placeholder="you@company.com" class="input-field">
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">Password</label>
+      <input id="password" type="password" placeholder="••••••••••" class="input-field">
+    </div>
+
+    <a href="#" id="forgotPassword" class="forgot-link">Forgot Password?</a>
+
+    <button id="loginBtn" class="btn-login">Login to Dashboard →</button>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span>or</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <p class="signup-prompt">
+      New here? <a href="signup.html">Create free account</a>
     </p>
 
-    <button id="loginBtn"
-      class="w-full bg-gradient-to-r from-indigo-600 to-indigo-800 text-white font-bold py-3 rounded-xl hover:scale-105 transition-transform shadow-lg">
-      Login
-    </button>
-
-    <p class="text-center text-gray-300 mt-5">
-      New here?
-      <a href="signup.html" class="text-indigo-400 font-semibold hover:underline">
-        Create account
-      </a>
-    </p>
   </div>
+
 </section>
 
-<!-- FIREBASE AUTH -->
+<!-- ═══════════════════════════════ FIREBASE AUTH (UNTOUCHED) ═══════════════════════════════ -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
   import { 
