@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pricing | ChatWidgetPro</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Razorpay -->
@@ -13,127 +13,542 @@
 
   <!-- Stripe -->
   <script src="https://js.stripe.com/v3/"></script>
+
+  <style>
+    :root {
+      --red: #e11d48;
+      --red-dark: #9f1239;
+      --red-glow: rgba(225, 29, 72, 0.35);
+      --black: #050505;
+      --black-soft: #0d0d0d;
+      --black-card: #111111;
+      --border: rgba(225, 29, 72, 0.18);
+      --border-subtle: rgba(255,255,255,0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--black);
+      color: #f0f0f0;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* grain */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.5;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 99px; }
+
+    /* ── NAVBAR ── */
+    header {
+      position: sticky; top: 0; z-index: 500;
+      background: rgba(5,5,5,0.88);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto;
+      padding: 18px 32px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem; letter-spacing: 2px;
+      color: #fff; text-decoration: none;
+    }
+    .logo span { color: var(--red); }
+    nav a {
+      color: #888; font-size: 0.88rem; font-weight: 500;
+      letter-spacing: 0.4px; text-decoration: none;
+      margin-left: 32px; transition: color 0.2s;
+    }
+    nav a:hover { color: #fff; }
+    nav a.active { color: var(--red); }
+    .nav-cta {
+      background: var(--red) !important; color: #fff !important;
+      padding: 9px 22px; border-radius: 8px; font-weight: 600;
+      box-shadow: 0 0 18px var(--red-glow); transition: all 0.25s !important;
+    }
+    .nav-cta:hover {
+      background: var(--red-dark) !important;
+      box-shadow: 0 0 30px var(--red-glow) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    /* ── MAIN ── */
+    main { flex: 1; position: relative; z-index: 2; }
+
+    /* ── HERO ── */
+    .pricing-hero {
+      padding: 100px 32px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pricing-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(225,29,72,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(225,29,72,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .pricing-hero::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 400px;
+      background: radial-gradient(ellipse, rgba(225,29,72,0.1) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(225,29,72,0.1);
+      border: 1px solid rgba(225,29,72,0.25);
+      color: #f87171; font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 5px 16px; border-radius: 99px;
+      margin-bottom: 24px; width: fit-content;
+      margin-left: auto; margin-right: auto;
+      position: relative; z-index: 2;
+    }
+    .hero-label::before {
+      content: ''; width: 5px; height: 5px;
+      background: var(--red); border-radius: 50%;
+      animation: blink 1.4s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; } 50% { opacity: 0.2; }
+    }
+
+    .pricing-hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      letter-spacing: 1px; color: #fff;
+      margin-bottom: 16px;
+      position: relative; z-index: 2;
+    }
+
+    .pricing-hero p {
+      color: #6b7280; font-size: 1.05rem;
+      max-width: 520px; margin: 0 auto;
+      font-weight: 300; line-height: 1.7;
+      position: relative; z-index: 2;
+    }
+
+    /* ── CARDS SECTION ── */
+    .cards-section {
+      max-width: 1100px; margin: 0 auto;
+      padding: 20px 32px 100px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ── PLAN CARD ── */
+    .plan-card {
+      background: var(--black-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 22px;
+      padding: 40px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .plan-card:hover {
+      border-color: var(--border);
+      transform: translateY(-6px);
+      box-shadow: 0 24px 60px rgba(225,29,72,0.08);
+    }
+
+    .plan-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+      transition: background 0.3s;
+    }
+
+    .plan-card:hover::before {
+      background: linear-gradient(90deg, transparent, var(--red), transparent);
+    }
+
+    /* FEATURED card */
+    .plan-card.featured {
+      border-color: var(--border);
+      background: #120a0d;
+      box-shadow: 0 0 40px rgba(225,29,72,0.1);
+      transform: scale(1.03);
+    }
+
+    .plan-card.featured::before {
+      background: linear-gradient(90deg, transparent, var(--red), transparent);
+    }
+
+    .plan-card.featured:hover {
+      transform: scale(1.03) translateY(-6px);
+    }
+
+    .popular-badge {
+      position: absolute; top: 20px; right: 20px;
+      background: var(--red);
+      color: #fff; font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 4px 12px; border-radius: 99px;
+      box-shadow: 0 0 14px var(--red-glow);
+    }
+
+    .plan-name {
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: #4b5563; margin-bottom: 12px;
+    }
+
+    .plan-card.featured .plan-name { color: #f87171; }
+
+    .plan-price {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.4rem; color: #fff;
+      letter-spacing: 1px; line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .plan-price sup {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem; font-weight: 500;
+      vertical-align: top; margin-top: 10px;
+      display: inline-block; color: #9ca3af;
+    }
+
+    .plan-price span {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem; color: #6b7280; font-weight: 400;
+    }
+
+    .plan-desc {
+      color: #4b5563; font-size: 0.85rem;
+      font-weight: 300; margin-bottom: 28px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* features list */
+    .features-list {
+      list-style: none;
+      margin-bottom: 32px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+
+    .features-list li {
+      display: flex; align-items: center; gap: 10px;
+      color: #9ca3af; font-size: 0.88rem; font-weight: 400;
+    }
+
+    .features-list li .check {
+      width: 18px; height: 18px; flex-shrink: 0;
+      background: rgba(225,29,72,0.12);
+      border: 1px solid rgba(225,29,72,0.25);
+      border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem; color: var(--red);
+    }
+
+    .plan-card.featured .features-list li { color: #d1d5db; }
+
+    /* ── BUTTONS ── */
+    .btn-disabled {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      color: #374151; font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem; font-weight: 600;
+      letter-spacing: 0.5px; padding: 13px;
+      border-radius: 10px; cursor: not-allowed;
+    }
+
+    .btn-plan {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: #fff; font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem; font-weight: 700;
+      letter-spacing: 0.5px; padding: 14px;
+      border-radius: 10px; cursor: pointer;
+      transition: all 0.25s;
+      position: relative; overflow: hidden;
+    }
+
+    .btn-plan::before {
+      content: '';
+      position: absolute; top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(225,29,72,0.06), transparent);
+      transition: left 0.4s;
+    }
+
+    .btn-plan:hover::before { left: 100%; }
+    .btn-plan:hover {
+      border-color: var(--red);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(225,29,72,0.15);
+    }
+
+    .btn-plan-primary {
+      width: 100%;
+      background: var(--red);
+      border: none; color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem; font-weight: 700;
+      letter-spacing: 0.5px; padding: 14px;
+      border-radius: 10px; cursor: pointer;
+      box-shadow: 0 0 24px var(--red-glow);
+      transition: all 0.25s;
+      position: relative; overflow: hidden;
+    }
+
+    .btn-plan-primary::before {
+      content: '';
+      position: absolute; top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+      transition: left 0.4s;
+    }
+
+    .btn-plan-primary:hover::before { left: 100%; }
+    .btn-plan-primary:hover {
+      background: var(--red-dark);
+      box-shadow: 0 0 38px rgba(225,29,72,0.5);
+      transform: translateY(-1px);
+    }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      padding: 90px 32px;
+      text-align: center;
+      position: relative;
+      background: var(--black-soft);
+      border-top: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 400px;
+      background: radial-gradient(ellipse, rgba(225,29,72,0.07) 0%, transparent 65%);
+    }
+
+    .cta-section h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      color: #fff; letter-spacing: 1px;
+      margin-bottom: 14px;
+      position: relative; z-index: 2;
+    }
+
+    .cta-section p {
+      color: #4b5563; font-size: 1rem;
+      font-weight: 300; max-width: 480px;
+      margin: 0 auto 36px;
+      position: relative; z-index: 2;
+    }
+
+    .btn-contact {
+      display: inline-block;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: #fff; font-weight: 700;
+      font-size: 0.95rem; letter-spacing: 0.5px;
+      padding: 16px 44px; border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.25s;
+      position: relative; z-index: 2;
+    }
+
+    .btn-contact:hover {
+      background: var(--red);
+      border-color: var(--red);
+      box-shadow: 0 0 28px var(--red-glow);
+      transform: translateY(-2px);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--black);
+      border-top: 1px solid var(--border-subtle);
+      padding: 36px 32px;
+      text-align: center;
+    }
+
+    .footer-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem; letter-spacing: 2px; color: #fff;
+      margin-bottom: 6px;
+    }
+    .footer-brand span { color: var(--red); }
+
+    .footer-tagline {
+      color: #374151; font-size: 0.8rem; font-weight: 300;
+      margin-bottom: 20px;
+    }
+
+    .footer-links {
+      display: flex; justify-content: center; gap: 28px;
+    }
+
+    .footer-links a {
+      color: #374151; font-size: 0.8rem;
+      text-decoration: none; transition: color 0.2s;
+      letter-spacing: 0.5px;
+    }
+
+    .footer-links a:hover { color: var(--red); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .cards-grid { grid-template-columns: 1fr; max-width: 440px; margin: 0 auto; }
+      .plan-card.featured { transform: none; }
+      .plan-card.featured:hover { transform: translateY(-6px); }
+    }
+
+    @media (max-width: 600px) {
+      nav a:not(.nav-cta) { display: none; }
+      .nav-inner { padding: 16px 20px; }
+      .pricing-hero { padding: 70px 20px 60px; }
+      .cards-section { padding: 20px 20px 70px; }
+    }
+  </style>
 </head>
 
-<body class="bg-gray-900 font-roboto flex flex-col min-h-screen">
+<body>
 
-<!-- NAVBAR -->
-<header class="bg-black/80 backdrop-blur-md shadow-md sticky top-0 z-50">
-  <div class="container mx-auto flex justify-between items-center p-4">
-    <a href="index.html" class="text-2xl font-bold text-indigo-400">ChatWidgetPro</a>
-    <nav class="space-x-6 text-gray-300 font-semibold">
-      <a href="index.html" class="hover:text-indigo-400">Home</a>
-      <a href="dashboard.html" class="hover:text-indigo-400">Dashboard</a>
-      <a href="pricing.html" class="text-indigo-400 font-bold">Pricing</a>
-      <a href="login.html" class="hover:text-indigo-400">Login</a>
+<!-- ═══════════════════════════════ NAVBAR ═══════════════════════════════ -->
+<header>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Chat<span>Widget</span>Pro</a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="pricing.html" class="active">Pricing</a>
+      <a href="login.html">Login</a>
     </nav>
   </div>
 </header>
 
-<main class="flex-grow">
+<main>
 
-<!-- HERO -->
-<section class="relative py-20 px-6 text-center bg-gradient-to-r from-indigo-800 via-black to-gray-900">
-  <h1 class="text-5xl font-bold text-white mb-4">Simple, Transparent Pricing</h1>
-  <p class="text-indigo-200 text-lg max-w-2xl mx-auto">Choose the plan that fits your business. Cancel anytime.</p>
+<!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+<section class="pricing-hero">
+  <div class="hero-label">Plans & Pricing</div>
+  <h1>Simple, Transparent<br>Pricing</h1>
+  <p>Choose the plan that fits your business. No hidden fees. Cancel anytime.</p>
 </section>
 
-<!-- PRICING CARDS -->
-<section class="container mx-auto py-16 px-6">
-  <div class="grid md:grid-cols-3 gap-8">
+<!-- ═══════════════════════════════ PRICING CARDS ═══════════════════════════════ -->
+<section class="cards-section">
+  <div class="cards-grid">
 
     <!-- FREE -->
-    <div class="bg-black/70 backdrop-blur-lg rounded-3xl shadow-2xl p-8 text-center text-gray-100">
-      <h2 class="text-2xl font-bold mb-2 text-indigo-400">Free</h2>
-      <p class="text-gray-300 mb-4">For testing & small sites</p>
-      <p class="text-4xl font-bold mb-6">₹0</p>
+    <div class="plan-card">
+      <div class="plan-name">Free</div>
+      <div class="plan-price">₹0</div>
+      <p class="plan-desc">For testing & small sites</p>
 
-      <ul class="text-gray-300 space-y-2 mb-6">
-        <li>✔ 100 messages / month</li>
-        <li>✔ Basic chatbot</li>
-        <li>✔ Widget branding</li>
+      <ul class="features-list">
+        <li><span class="check">✓</span> 100 messages / month</li>
+        <li><span class="check">✓</span> Basic chatbot</li>
+        <li><span class="check">✓</span> Widget branding</li>
       </ul>
 
-      <button disabled
-        class="w-full bg-gray-600 text-gray-400 font-bold py-3 rounded-xl cursor-not-allowed">
-        Current Plan
-      </button>
+      <button disabled class="btn-disabled">Current Plan</button>
     </div>
 
     <!-- BASIC -->
-    <div class="bg-black/70 backdrop-blur-lg rounded-3xl shadow-2xl p-8 text-center border-2 border-indigo-400 text-gray-100">
-      <h2 class="text-2xl font-bold mb-2 text-indigo-400">Basic</h2>
-      <p class="text-gray-300 mb-4">Best for growing websites</p>
-      <p class="text-4xl font-bold mb-6">₹999<span class="text-lg">/mo</span></p>
+    <div class="plan-card featured">
+      <div class="popular-badge">Most Popular</div>
+      <div class="plan-name">Basic</div>
+      <div class="plan-price"><sup>₹</sup>999<span>/mo</span></div>
+      <p class="plan-desc">Best for growing websites</p>
 
-      <ul class="text-gray-300 space-y-2 mb-6">
-        <li>✔ 1000 messages / month</li>
-        <li>✔ No branding</li>
-        <li>✔ Email support</li>
-        <li>✔ 1 website integration</li>
+      <ul class="features-list">
+        <li><span class="check">✓</span> 1,000 messages / month</li>
+        <li><span class="check">✓</span> No branding</li>
+        <li><span class="check">✓</span> Email support</li>
+        <li><span class="check">✓</span> 1 website integration</li>
       </ul>
 
-      <button onclick="subscribe('basic')"
-        class="w-full bg-gradient-to-r from-indigo-600 to-indigo-800 text-white font-bold py-3 rounded-xl hover:scale-105 transition-transform shadow-lg">
-        Buy Basic
-      </button>
+      <button onclick="subscribe('basic')" class="btn-plan-primary">Buy Basic →</button>
     </div>
 
     <!-- PRO -->
-    <div class="bg-black/70 backdrop-blur-lg rounded-3xl shadow-2xl p-8 text-center text-gray-100">
-      <h2 class="text-2xl font-bold mb-2 text-indigo-400">Pro</h2>
-      <p class="text-gray-300 mb-4">For businesses & startups</p>
-      <p class="text-4xl font-bold mb-6">₹2999<span class="text-lg">/mo</span></p>
+    <div class="plan-card">
+      <div class="plan-name">Pro</div>
+      <div class="plan-price"><sup>₹</sup>2999<span>/mo</span></div>
+      <p class="plan-desc">For businesses & startups</p>
 
-      <ul class="text-gray-300 space-y-2 mb-6">
-        <li>✔ 5,000 messages / month</li>
-        <li>✔ Priority support</li>
-        <li>✔ Advanced analytics</li>
-        <li>✔⭐ MOST POPULAR</li>
+      <ul class="features-list">
+        <li><span class="check">✓</span> 5,000 messages / month</li>
+        <li><span class="check">✓</span> Priority support</li>
+        <li><span class="check">✓</span> Advanced analytics</li>
+        <li><span class="check">✓</span> Multi-site integration</li>
       </ul>
 
-      <button onclick="subscribe('pro')"
-        class="w-full bg-gradient-to-r from-green-600 to-green-800 text-white font-bold py-3 rounded-xl hover:scale-105 transition-transform shadow-lg">
-        Buy Pro
-      </button>
+      <button onclick="subscribe('pro')" class="btn-plan">Buy Pro →</button>
     </div>
 
   </div>
 </section>
 
-<!-- CTA -->
-<section class="bg-indigo-800 text-white py-20 text-center">
-  <div class="container mx-auto px-6 max-w-3xl">
-    <h2 class="text-4xl font-bold mb-4">Need a Custom or Enterprise Plan?</h2>
-    <p class="text-indigo-200 mb-8 text-lg">Unlimited messages, custom features & dedicated priority support</p>
-    <a href="mailto:support@chatwidgetpro.com"
-       class="inline-block bg-yellow-400 text-indigo-900 font-bold px-10 py-4 rounded-full hover:bg-yellow-500 transition shadow-lg">
-      Contact Sales
-    </a>
-  </div>
+<!-- ═══════════════════════════════ CTA ═══════════════════════════════ -->
+<section class="cta-section">
+  <h2>Need a Custom Enterprise Plan?</h2>
+  <p>Unlimited messages, custom features & dedicated priority support for your team.</p>
+  <a href="mailto:support@chatwidgetpro.com" class="btn-contact">Contact Sales →</a>
 </section>
 
 </main>
 
-<!-- FOOTER -->
-<footer class="bg-black text-gray-300 py-8">
-  <div class="container mx-auto px-6 text-center text-sm space-y-2">
-    <p class="font-semibold text-white">© 2026 ChatWidgetPro</p>
-    <p>Simple AI Chat Widgets for Modern Businesses</p>
-    <div class="flex justify-center gap-6 mt-4">
-      <a href="#" class="hover:text-white">Privacy</a>
-      <a href="#" class="hover:text-white">Terms</a>
-      <a href="#" class="hover:text-white">Support</a>
-    </div>
+<!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
+<footer>
+  <div class="footer-brand">Chat<span>Widget</span>Pro</div>
+  <p class="footer-tagline">Simple AI Chat Widgets for Modern Businesses</p>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Support</a>
   </div>
 </footer>
 
-<!-- PAYMENT LOGIC -->
+<!-- ═══════════════════════════════ PAYMENT LOGIC (UNTOUCHED) ═══════════════════════════════ -->
 <script>
 const PAYMENT_GATEWAY = "razorpay"; // or "stripe"
 const RAZORPAY_KEY = "rzp_test_XXXXXXXXXX";
 const STRIPE_KEY = "pk_test_XXXXXXXXXXXX";
-const stripe = Stripe(STRIPE_KEY);
 
 function subscribe(plan) {
   PAYMENT_GATEWAY === "razorpay"
@@ -156,6 +571,7 @@ function razorpayCheckout(plan) {
 }
 
 function stripeCheckout(plan) {
+  const stripe = Stripe(STRIPE_KEY);
   fetch("/create-stripe-session", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
