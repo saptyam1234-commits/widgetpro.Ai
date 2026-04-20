@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Us | ChatWidgetPro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{--red:#e11d48;--red-dark:#9f1239;--red-glow:rgba(225,29,72,0.35);--black:#050505;--black-card:#111;--border:rgba(225,29,72,0.15)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Outfit',sans-serif;background:var(--black);color:#f0f0f0;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:0.5}
+    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--black)}::-webkit-scrollbar-thumb{background:var(--red);border-radius:99px}
+    header{position:sticky;top:0;z-index:500;background:rgba(5,5,5,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+    .nav-inner{max-width:1200px;margin:0 auto;padding:18px 32px;display:flex;justify-content:space-between;align-items:center}
+    .logo{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:#fff;text-decoration:none}
+    .logo span{color:var(--red)}
+    nav a{color:#888;font-size:.88rem;font-weight:500;text-decoration:none;margin-left:32px;transition:color .2s}
+    nav a:hover{color:#fff}
+    .nav-cta{background:var(--red)!important;color:#fff!important;padding:9px 22px;border-radius:8px;font-weight:600;box-shadow:0 0 18px var(--red-glow)}
+    .nav-cta:hover{background:var(--red-dark)!important;transform:translateY(-1px)!important}
+    main{flex:1;position:relative;z-index:2}
+
+    /* hero */
+    .page-hero{padding:80px 32px 60px;text-align:center;position:relative;overflow:hidden}
+    .page-hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(225,29,72,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(225,29,72,0.04) 1px,transparent 1px);background-size:60px 60px}
+    .page-hero::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(225,29,72,0.08) 0%,transparent 65%)}
+    .hero-label{display:inline-flex;align-items:center;gap:8px;background:rgba(225,29,72,0.1);border:1px solid rgba(225,29,72,0.25);color:#f87171;font-size:.7rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:5px 16px;border-radius:99px;margin-bottom:20px;position:relative;z-index:2}
+    .page-hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4rem);color:#fff;letter-spacing:1px;margin-bottom:12px;position:relative;z-index:2}
+    .page-hero p{color:#4b5563;font-size:.9rem;font-weight:300;position:relative;z-index:2}
+
+    /* contact layout */
+    .contact-body{max-width:1000px;margin:0 auto;padding:20px 32px 100px;display:grid;grid-template-columns:1fr 1.6fr;gap:36px}
+
+    /* info cards */
+    .info-col{display:flex;flex-direction:column;gap:16px}
+    .info-card{background:var(--black-card);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:28px 24px;transition:border-color .3s,transform .3s;position:relative;overflow:hidden}
+    .info-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent);transition:background .3s}
+    .info-card:hover{border-color:var(--border);transform:translateY(-3px)}
+    .info-card:hover::before{background:linear-gradient(90deg,transparent,var(--red),transparent)}
+    .info-icon{font-size:1.5rem;margin-bottom:12px}
+    .info-card h3{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#4b5563;margin-bottom:8px}
+    .info-card p,.info-card a{color:#6b7280;font-size:.88rem;font-weight:300;line-height:1.6;text-decoration:none;transition:color .2s}
+    .info-card a:hover{color:var(--red)}
+
+    /* form card */
+    .form-card{background:var(--black-card);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:44px 40px;position:relative;overflow:hidden}
+    .form-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
+    .form-card h2{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:1px;color:#fff;margin-bottom:6px}
+    .form-card p{color:#4b5563;font-size:.85rem;font-weight:300;margin-bottom:32px}
+
+    .input-group{margin-bottom:16px}
+    .input-label{display:block;font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#4b5563;margin-bottom:8px}
+    .input-field{width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:13px 18px;font-family:'Outfit',sans-serif;font-size:.92rem;color:#fff;outline:none;transition:border-color .25s,box-shadow .25s}
+    .input-field::placeholder{color:#374151}
+    .input-field:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(225,29,72,0.1);background:rgba(225,29,72,0.03)}
+    textarea.input-field{resize:vertical;min-height:130px}
+
+    .btn-send{width:100%;background:var(--red);color:#fff;font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;letter-spacing:.5px;padding:15px;border:none;border-radius:10px;cursor:pointer;box-shadow:0 0 24px var(--red-glow);transition:all .25s;position:relative;overflow:hidden;margin-top:4px}
+    .btn-send::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);transition:left .4s}
+    .btn-send:hover::before{left:100%}
+    .btn-send:hover{background:var(--red-dark);box-shadow:0 0 38px rgba(225,29,72,0.5);transform:translateY(-1px)}
+
+    .success-msg{display:none;background:rgba(225,29,72,0.08);border:1px solid rgba(225,29,72,0.25);border-radius:10px;padding:16px 20px;text-align:center;color:#f87171;font-size:.88rem;margin-top:16px}
+
+    @media(max-width:800px){.contact-body{grid-template-columns:1fr}.form-card{padding:32px 24px}}
+    @media(max-width:600px){nav a:not(.nav-cta){display:none}.nav-inner{padding:16px 20px}.contact-body{padding:20px 16px 60px}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Chat<span>Widget</span>Pro</a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="login.html">Login</a>
+      <a href="signup.html" class="nav-cta">Get Started</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="page-hero">
+    <div class="hero-label">Get in Touch</div>
+    <h1>Contact Us</h1>
+    <p>We typically respond within 24 hours on business days</p>
+  </div>
+
+  <div class="contact-body">
+
+    <!-- LEFT: Info cards -->
+    <div class="info-col">
+
+      <div class="info-card">
+        <div class="info-icon">📧</div>
+        <h3>Email Support</h3>
+        <a href="mailto:support@chatwidgetpro.com">support@chatwidgetpro.com</a>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">⏱️</div>
+        <h3>Response Time</h3>
+        <p>Within 24 hours on business days (Mon–Fri)</p>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">📋</div>
+        <h3>Policies</h3>
+        <p>
+          <a href="privacy-policy.html" style="display:block;margin-bottom:6px">→ Privacy Policy</a>
+          <a href="terms.html" style="display:block;margin-bottom:6px">→ Terms & Conditions</a>
+          <a href="refund-policy.html" style="display:block">→ Refund Policy</a>
+        </p>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Contact form -->
+    <div class="form-card">
+      <h2>Send a Message</h2>
+      <p>Fill in the form and our team will get back to you shortly.</p>
+
+      <div class="input-group">
+        <label class="input-label">Full Name</label>
+        <input id="c-name" type="text" placeholder="John Smith" class="input-field">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Email Address</label>
+        <input id="c-email" type="email" placeholder="you@company.com" class="input-field">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Subject</label>
+        <input id="c-subject" type="text" placeholder="e.g. Billing question, Technical issue..." class="input-field">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Message</label>
+        <textarea id="c-message" placeholder="Describe your issue or question in detail..." class="input-field"></textarea>
+      </div>
+
+      <button class="btn-send" onclick="sendContact()">Send Message →</button>
+
+      <div class="success-msg" id="successMsg">
+        ✅ Message sent! We'll get back to you within 24 hours.
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<style>
+  .cwp-footer{background:#050505;border-top:1px solid rgba(225,29,72,0.15);padding:64px 32px 32px;font-family:'Outfit',sans-serif;position:relative;overflow:hidden;z-index:2}
+  .cwp-footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:1px;background:linear-gradient(90deg,transparent,rgba(225,29,72,0.5),transparent)}
+  .cwp-footer-inner{max-width:1100px;margin:0 auto}
+  .cwp-footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:48px;padding-bottom:48px;border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:32px}
+  .cwp-footer-brand .brand-logo{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:2px;color:#fff;text-decoration:none;display:block;margin-bottom:12px}
+  .cwp-footer-brand .brand-logo span{color:#e11d48}
+  .cwp-footer-brand p{color:#374151;font-size:.83rem;font-weight:300;line-height:1.7;max-width:220px;margin-bottom:20px}
+  .cwp-footer-brand .brand-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(225,29,72,0.08);border:1px solid rgba(225,29,72,0.2);border-radius:99px;padding:4px 12px;font-size:.68rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#f87171}
+  .cwp-footer-brand .brand-badge::before{content:'';width:5px;height:5px;background:#e11d48;border-radius:50%;animation:cwp-blink 1.4s infinite}
+  @keyframes cwp-blink{0%,100%{opacity:1}50%{opacity:0.15}}
+  .cwp-footer-col h4{font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#4b5563;margin-bottom:18px}
+  .cwp-footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .cwp-footer-col ul li a{color:#4b5563;font-size:.85rem;text-decoration:none;transition:color .2s,padding-left .2s;display:inline-block}
+  .cwp-footer-col ul li a:hover{color:#e11d48;padding-left:4px}
+  .cwp-footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+  .cwp-footer-copy{color:#1f2937;font-size:.78rem;font-weight:300}
+  .cwp-footer-copy span{color:#e11d48}
+  .cwp-footer-policy{display:flex;gap:24px}
+  .cwp-footer-policy a{color:#1f2937;font-size:.78rem;text-decoration:none;transition:color .2s}
+  .cwp-footer-policy a:hover{color:#e11d48}
+  @media(max-width:900px){.cwp-footer-top{grid-template-columns:1fr 1fr;gap:32px}}
+  @media(max-width:560px){.cwp-footer-top{grid-template-columns:1fr;gap:28px}.cwp-footer-bottom{flex-direction:column;text-align:center}.cwp-footer-policy{flex-wrap:wrap;justify-content:center;gap:16px}.cwp-footer{padding:48px 20px 28px}}
+</style>
+<footer class="cwp-footer">
+  <div class="cwp-footer-inner">
+    <div class="cwp-footer-top">
+      <div class="cwp-footer-brand"><a href="index.html" class="brand-logo">Chat<span>Widget</span>Pro</a><p>AI-powered chatbot widget for websites. Setup in 5 minutes, manage from one dashboard.</p><div class="brand-badge">AI Powered</div></div>
+      <div class="cwp-footer-col"><h4>Product</h4><ul><li><a href="index.html">Home</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="dashboard.html">Dashboard</a></li><li><a href="signup.html">Get Started</a></li></ul></div>
+      <div class="cwp-footer-col"><h4>Legal</h4><ul><li><a href="privacy-policy.html">Privacy Policy</a></li><li><a href="terms.html">Terms & Conditions</a></li><li><a href="refund-policy.html">Refund Policy</a></li></ul></div>
+      <div class="cwp-footer-col"><h4>Support</h4><ul><li><a href="contact.html">Contact Us</a></li><li><a href="mailto:support@chatwidgetpro.com">Email Support</a></li><li><a href="login.html">Login</a></li></ul></div>
+    </div>
+    <div class="cwp-footer-bottom">
+      <p class="cwp-footer-copy">© 2026 <span>ChatWidgetPro</span>. All rights reserved.</p>
+      <div class="cwp-footer-policy"><a href="privacy-policy.html">Privacy</a><a href="terms.html">Terms</a><a href="refund-policy.html">Refund</a><a href="contact.html">Contact</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function sendContact() {
+  const name    = document.getElementById('c-name').value.trim();
+  const email   = document.getElementById('c-email').value.trim();
+  const subject = document.getElementById('c-subject').value.trim();
+  const message = document.getElementById('c-message').value.trim();
+
+  if (!name || !email || !message) {
+    alert('Please fill in your name, email and message.');
+    return;
+  }
+
+  // mailto fallback — replace with your backend/EmailJS/Formspree endpoint
+  const mailto = `mailto:support@chatwidgetpro.com?subject=${encodeURIComponent(subject || 'Contact Form')}&body=${encodeURIComponent('Name: '+name+'\nEmail: '+email+'\n\n'+message)}`;
+  window.location.href = mailto;
+
+  document.getElementById('successMsg').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
